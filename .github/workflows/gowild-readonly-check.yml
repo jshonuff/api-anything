@@ -1,0 +1,60 @@
+name: GoWild read-only fare check
+
+on:
+  push:
+    branches:
+      - claude/frontier-gowild-github-review-wzeb3y
+    paths:
+      - .github/workflows/gowild-readonly-check.yml
+  workflow_dispatch:
+    inputs:
+      origin:
+        description: 'Three-letter departure airport'
+        required: true
+        default: DFW
+      destination:
+        description: 'Three-letter destination airport'
+        required: true
+        default: DEN
+      depart_date:
+        description: 'Outbound date YYYY-MM-DD'
+        required: true
+        default: '2026-10-29'
+      return_date:
+        description: 'Optional return date YYYY-MM-DD'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Search Frontier without credentials
+        env:
+          ORIGIN: ${{ inputs.origin || 'DFW' }}
+          DESTINATION: ${{ inputs.destination || 'DEN' }}
+          DEPART_DATE: ${{ inputs.depart_date || '2026-10-29' }}
+          RETURN_DATE: ${{ inputs.return_date || '' }}
+        run: |
+          set -euo pipefail
+          args=("$ORIGIN" "$DESTINATION" "$DEPART_DATE" "--nonstop")
+          if [[ -n "$RETURN_DATE" ]]; then
+            args+=("--return" "$RETURN_DATE")
+          fi
+          node tools/gowild-check/gowild-check.js "${args[@]}"
+      - name: Save report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gowild-readonly-results
+          path: results-*.json
+          if-no-files-found: ignore
+          retention-days: 1
