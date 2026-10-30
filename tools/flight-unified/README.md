@@ -97,6 +97,48 @@ The isolated Python virtualenv is gitignored. If already installed elsewhere, se
 
 **Validated** with simulated providers: HTTP input/authorization tests and headless Chromium interactive search, without live airline calls in CI. A locally run real search still requires installing the Python dependency and observing provider-specific behavior; no checkout or actual booking has been verified. Existing FLIGHT-1 production dispatch remains disabled.
 
+## Private iPhone access via Tailscale Serve — opt-in pilot
+
+**Status: code and simulated mobile test passed; NOT deployed on a real Tailscale network.**
+This is a private Safari/mobile-browser path, not a native ChatGPT connector. Tailscale's Serve feature makes a loopback-only app accessible to an authorized user's devices on the same tailnet using an HTTPS `.ts.net` name. **Never substitute Tailscale Funnel**, which is public.
+
+### Prerequisites
+
+1. A computer running Node.js 22+, Python 3.12+, Git and Tailscale with access to your development checkout. This computer must be on and online during searches.
+2. The one-time local FLI installation: `bash tools/flight-unified/setup-local.sh`.
+3. Tailscale on the same computer and on your iPhone, both signed into your private tailnet. Tailscale HTTPS certificates and MagicDNS must be enabled.
+4. The exact Tailscale HTTPS hostname for your computer and the exact login identity you intend to authorize. **Do not commit these to GitHub or publish them in CI logs.** Tailnet access policies should also restrict access.
+
+### Opt-in usage (macOS/Linux shell)
+
+In terminal 1 from the repository root, insert your actual private Tailscale values:
+
+```sh
+export FLIGHT_TAILNET_HOST="computer.your-tailnet.ts.net"
+export FLIGHT_TAILNET_USER="your-tailscale-login@example.com"
+node tools/flight-unified/start-tailnet.mjs
+```
+
+In terminal 2, run the **private** Tailscale reverse proxy in the foreground:
+
+```sh
+tailscale serve 8766
+```
+
+Tailscale prints an HTTPS tailnet URL. On your iPhone, connect through the Tailscale iOS app and visit that URL followed by `/dashboard/` in Safari. Submit a flight search and use the same price-verification labels as on desktop.
+
+The backend binds to `127.0.0.1:8765`; the identity gateway binds to `127.0.0.1:8766`. The gateway uses explicit hostname allowlisting, the `Tailscale-User-Login` identity header supplied by Tailscale Serve, a single authorized user, HTTPS-origin validation, strict request and route allowlists, body-size limits, and sanitization of errors. It rewrites requests only to its fixed local backend. Tagged devices without user identity are intentionally denied. It creates no user account, database, bookings, or provider schedules. The existing GoWild and Python FLI retrieval modules are unchanged.
+
+**Shutdown:** Press Ctrl+C in both terminals. If you chose to configure Serve persistently in a different way, first inspect `tailscale serve status`, then disable only the relevant HTTPS Serve mapping using `tailscale serve --https=443 off`. Never enable `tailscale funnel` for this pilot.
+
+**Security limitations:** Anyone authorized as the specified Tailscale user on an allowed device can execute searches while the gateway is running; protect the tailnet account and devices. Access is private to the tailnet, not a general-purpose multi-user web service. Tailscale Serve forwards user identity on tailnet requests; a public Funnel connection does not supply it, and this gateway rejects missing identities. If your installed Tailscale version forwards different Host headers, the gateway deliberately fails closed pending an explicit compatibility test. Local applications on the same computer are within the machine's trust boundary.
+
+**What was actually tested:** 30/30 offline tests including wrong-host, wrong-user, missing identity, forged Origin, oversized/chunked requests, safe local forwarding, and no changes to the production owner. A Chromium 390×844 mobile-view test passed through a **simulated** Serve relay with a mocked provider; it made no Frontier/Google live queries. Evidence:
+- Offline: https://github.com/jshonuff/api-anything/actions/runs/41123359355
+- Simulated mobile UI: https://github.com/jshonuff/api-anything/actions/runs/41123376431
+
+**Remaining acceptance:** Authorize device setup yourself, perform a real iPhone → Tailscale Serve → local gateway check, confirm a low-volume live search and checkout, verify privacy/security against actual Tailscale proxy behavior, and receive explicit FLIGHT-1 promotion approval. No real mobile access has been activated by ChatGPT. This approach does not make the tailnet hostname accessible to ChatGPT's cloud; direct chat querying requires a separately approved connector architecture.
+
 ## Remaining promotion gates
 
 - Review and independently reconcile selected fares with actual checkout and fare inclusions.
