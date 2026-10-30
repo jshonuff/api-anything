@@ -9,6 +9,7 @@ import {tmpdir} from 'node:os';
 import {join,dirname,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {normalizeFrontier,normalizeEric,normalizeFli,summarizeSources} from './normalize.mjs';
+import {selectAlertCandidates} from './alerts.mjs';
 const exec=promisify(execFile);
 const base=dirname(fileURLToPath(import.meta.url));
 const args=process.argv.slice(2);
@@ -77,5 +78,5 @@ try {
  }
  const summary=summarizeSources(normalized,{outboundDate:date,returnDate});
  // A failed comparison is not a sold-out signal.
- process.stdout.write(JSON.stringify({origin,destination,date,returnDate,problems,...summary},null,2)+'\n');
+ process.stdout.write(JSON.stringify({origin,destination,date,returnDate,problems,...summary,alertCandidates:selectAlertCandidates(normalized)},null,2)+'\n');
 } finally {await rm(temp,{recursive:true,force:true});}
