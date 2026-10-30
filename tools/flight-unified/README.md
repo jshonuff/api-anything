@@ -47,7 +47,8 @@ Optional FLI-JS: the version in the checked GitHub source is not published on np
 - [x] Reviewed source and license of Eric Hansen `flights` (MIT).
 - [x] Baseline GoWild checker had an earlier independent live read from Frontier (2026-10-27).
 - [x] Deterministic unit tests defined for 9 combinations, sentinel `-1`, unknown/blocked, baggage profile, provider isolation.
-- [x] Offline core verification passed (9 tests, 0 failures): https://github.com/jshonuff/api-anything/actions/runs/41077394553\n- [ ] Pinned FLI-JS source build and import verified on GitHub Actions.
+- [x] Offline core verification passed (9 tests, 0 failures): https://github.com/jshonuff/api-anything/actions/runs/41077394553
+- [x] Pinned FLI-JS source build and import verified on GitHub Actions: https://github.com/jshonuff/api-anything/actions/runs/41077995961
 - [ ] FLI-JS live adapter verified (one route only).
 - [ ] Eric Python adapter verified (one route only).
 - [ ] Combined one-route comparison reconciled independently with actual checkout.
@@ -59,3 +60,12 @@ Optional FLI-JS: the version in the checked GitHub source is not published on np
 - Canon: live **Supabase**. GitHub is source code and development evidence only.
 - Existing JC-SAVAGE production dispatch remains disabled; this pilot must not override it.
 - Fallback: retain the proven GoWild checker as a separate working path if FLI/Python integration becomes unreliable.
+
+## First one-off live integration result — 2026-10-30
+- One generic demonstration route, no account login or booking.
+- Frontier booking-page adapter: **OBSERVED, 4 itineraries**.
+- FLI-JS adapter: **UNKNOWN, 0 itineraries**.
+- Eric Python adapter: **UNKNOWN, 0 itineraries**.
+- The failed optional adapters did **not** suppress valid Frontier results. The entire workflow completed successfully, but **this is not end-to-end live multi-provider success**.
+- Evidence: https://github.com/jshonuff/api-anything/actions/runs/41078251090
+- **Decision:** Keep adapters independent, retain proven GoWild standalone tool, diagnose optional providers separately. No production promotion, no scheduled monitoring or Supabase write.
