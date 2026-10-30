@@ -1,4 +1,4 @@
-name: FLIGHT-1 optional adapter diagnostics (one-off)
+name: FLIGHT-1 optional adapter diagnostics (response format check)
 on:
   push:
     branches:
@@ -22,9 +22,9 @@ jobs:
         run: |
           python3 -m venv "$RUNNER_TEMP/flight-python"
           "$RUNNER_TEMP/flight-python/bin/python" -m pip install --quiet "git+https://github.com/ericchansen/flights.git@090f4247dc334aa8a6fc240fc0b7633fe4f962d8"
-      - name: FLI diagnostic — one generic route
+      - name: FLI HTTP and parser shape — one generic route
         run: node tools/flight-unified/diagnose.mjs fli DEN LAS 2026-11-01
-      - name: Eric diagnostic — one generic route
+      - name: Eric environment response — one generic route
         env:
           FLIGHT_PYTHON: ${{ runner.temp }}/flight-python/bin/python
         run: node tools/flight-unified/diagnose.mjs eric DEN LAS 2026-11-01
