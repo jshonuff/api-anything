@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {normalizeFrontier,normalizeFli,normalizeEric,compareFrontierRoundTrip,summarizeSources,PROFILE,FARES} from './normalize.mjs';
+import {selectAlertCandidates} from './alerts.mjs';
 const report={checkedAt:'2026-10-27T09:11:39Z',results:[
  {from:'DFW',to:'DEN',date:'2026-11-05',status:'OK',flights:[
   {flights:'F92549',depart:'2026-11-05T07:00:00',arrive:'2026-11-05T08:22:00',stops:0,gowild:78.99,discountDenFare:92,standardFare:151.98},
@@ -62,4 +63,14 @@ test('no stale or unreadable Frontier page gets an invented seat',()=>{
  const r=normalizeFrontier({checkedAt:'2026-10-27T09:00:00Z',results:[{from:'DFW',to:'DEN',date:'2026-11-05',status:'UNKNOWN',blocked:true,reason:'HTTP 429',flights:[]}]});
  assert.equal(r[0].itineraries.length,0);
  assert.equal(r[0].status,'UNKNOWN');
+});
+
+test('alerts use only fresh observed GoWild fares, never candidates or stale snapshots',()=>{
+ const [fresh]=normalizeFrontier(report);
+ fresh.checkedAt='2026-11-04T12:00:00Z';
+ const events=selectAlertCandidates([fresh,{provider:'eric_frontier',status:'CANDIDATE_ONLY',checkedAt:fresh.checkedAt,itineraries:[{goWildStatus:'FARE_OBSERVED',fares:{gowild:1}}]}],{now:'2026-11-04T12:15:00Z',maxFare:80});
+ assert.equal(events.length,1);
+ assert.equal(events[0].amount,78.99);
+ assert.equal(events[0].delivery,'NOT_SENT');
+ assert.equal(selectAlertCandidates([fresh],{now:'2026-11-05T00:15:00Z',maxFare:80}).length,0);
 });
