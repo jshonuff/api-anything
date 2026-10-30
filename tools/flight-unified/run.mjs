@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Development-only local orchestrator. Read-only, fail-open by provider, never writes to Supabase.
-// Usage: node tools/flight-unified/run.mjs DFW DEN 2026-11-05 [--return 2026-11-09] [--fli] [--eric] [--nonstop]
+// Usage: node tools/flight-unified/run.mjs DFW DEN 2026-11-05 [--return 2026-11-09] [--fli] [--fli-python] [--eric] [--nonstop]
 // Requires Node >= 22 and optional fli-js / installed ericchansen/flights.
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
@@ -63,6 +63,23 @@ try {
  }catch(e) {
   problems.push({provider:'google_flights',status:'UNKNOWN',reason:'PROVIDER_UNAVAILABLE_OR_NO_RESULTS'});
   normalized.push({provider:'google_flights',origin:r.from,destination:r.to,date:r.date,status:'UNKNOWN',itineraries:[]});
+ }
+ // Original Python FLI uses a separate TLS/response stack: optional Google cash-fare fallback.
+ // It remains independent, and never confirms GoWild seats.
+ if(args.includes('--fli-python')) for(const r of routes) try {
+  const {stdout}=await exec(process.env.FLI_PYTHON||'python3',
+   [join(base,'fli_python_bridge.py'),r.from,r.to,r.date,...(args.includes('--nonstop')?['--nonstop']:[])],
+   {cwd:temp,timeout,maxBuffer:2*1024*1024});
+  const data=JSON.parse(stdout);
+  if(!Array.isArray(data))throw new Error('Unexpected Python FLI response');
+  if(!data.length)throw new Error('No Python FLI flights returned');
+  const normalizedFli=normalizeFli(data,{origin:r.from,destination:r.to,date:r.date,checkedAt:new Date().toISOString()});
+  normalizedFli.provider='google_flights_python';
+  normalizedFli.itineraries=normalizedFli.itineraries.map(f=>({...f,provider:'google_flights_python'}));
+  normalized.push(normalizedFli);
+ }catch(e){
+  problems.push({provider:'google_flights_python',status:'UNKNOWN',reason:'PROVIDER_UNAVAILABLE_OR_NO_RESULTS'});
+  normalized.push({provider:'google_flights_python',origin:r.from,destination:r.to,date:r.date,status:'UNKNOWN',itineraries:[]});
  }
  // Independent optional Python SDK corroboration (not a substitute for GoWild booking evidence).
  if(args.includes('--eric')) for(const r of routes) try {
