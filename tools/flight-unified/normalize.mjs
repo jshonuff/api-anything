@@ -44,11 +44,11 @@ export function normalizeEric(rows, {origin, destination, date, checkedAt = null
         standard:cleanPrice(r.standard_fare)}, miles:r.miles ?? null
     }))};
 }
-export function normalizeFli(results, {origin, destination, date, checkedAt = null} = {}) {
+export function normalizeFli(results, {origin, destination, date, checkedAt = null, provider = 'google_flights'} = {}) {
   if (!Array.isArray(results)) throw new Error('FLI results must be an array');
-  return {provider:'google_flights',origin,destination,date,checkedAt,
+  return {provider,origin,destination,date,checkedAt,
     status:'REFERENCE_ONLY',itineraries:results.filter(x => x && !Array.isArray(x)).map(r => ({
-      provider:'google_flights',
+      provider,
       flight:(r.legs ?? []).map(l => String(l.flight_number ?? '')).join('+'),
       origin,destination,date,
       departure:r.legs?.[0]?.departure_datetime ?? '',
