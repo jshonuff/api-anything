@@ -13,10 +13,22 @@
 <section class="intro">
 <h1>GoWild + Google Flights</h1>
 <p>One comparison view. Every fare keeps its provider and verification status.</p>
+<form id="searchForm" class="search-form">
+<div class="search-fields">
+<label>From airport <input id="searchOrigin" name="origin" maxlength="3" value="MCI" required pattern="[A-Z]{3}" autocomplete="off"></label>
+<label>To airport <input id="searchDestination" name="destination" maxlength="3" value="DEN" required pattern="[A-Z]{3}" autocomplete="off"></label>
+<label>Departure date <input id="searchDate" name="date" type="date" required></label>
+<label>Return date (optional) <input id="searchReturn" name="returnDate" type="date"></label>
+</div>
+<label><input id="searchNonstop" name="nonstop" type="checkbox"> Nonstop only</label>
+<button id="searchButton" type="submit">Search Frontier + Google Flights</button>
+<p class="note">Runs only on your computer through localhost. Frontier GoWild fares are observations; final bookability and checkout must be confirmed.</p>
+</form>
+<hr>
 <label for="dataFile">Load a local search result (JSON)</label>
 <input id="dataFile" type="file" accept=".json,application/json">
 <button id="demo" type="button">Show synthetic demonstration</button>
-<p class="note">No file upload or permanent storage. Checkout verification is manual.</p>
+<p class="note">Optional: import a previous private JSON result. This app does not persist searches or transmit files to an external server.</p>
 </section>
 <section id="summary"></section>
 <section id="controls" hidden>
