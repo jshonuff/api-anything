@@ -1,0 +1,32 @@
+name: FLIGHT-1 unified pilot offline verification
+
+on:
+  push:
+    branches:
+      - jc-savage/flight-unified-pilot-20261030
+    paths:
+      - .github/workflows/flight-unified-ci.yml
+      - tools/flight-unified/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Static JS syntax verification (NO LIVE QUERIES)
+        run: |
+          node --check tools/flight-unified/normalize.mjs
+          node --check tools/flight-unified/run.mjs
+          node --check tools/flight-unified/normalize.test.mjs
+      - name: Verify isolated provider logic (NO LIVE QUERIES)
+        run: node --test tools/flight-unified/normalize.test.mjs
+      - name: Python syntax check (NO LIVE QUERIES)
+        run: python3 -m py_compile tools/flight-unified/eric_bridge.py
