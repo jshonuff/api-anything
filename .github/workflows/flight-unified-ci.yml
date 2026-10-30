@@ -27,11 +27,8 @@ jobs:
           node --check tools/flight-unified/run.mjs
           node --check tools/flight-unified/alerts.mjs
           node --check tools/flight-unified/normalize.test.mjs
-      - name: Install and import pinned FLI-JS (NO LIVE QUERIES)
-        run: |
-          npm install --prefix tools/flight-unified --ignore-scripts --no-audit --no-fund
-          cd tools/flight-unified
-          node --input-type=module -e "import('fli-js').then(x => { if (!x.SearchFlights || !x.FlightSearchFilters) process.exit(2); console.log('FLI-JS library import verified'); })"
+      - name: Build pinned FLI-JS from source (NO LIVE QUERIES)
+        run: bash tools/flight-unified/bootstrap-fli.sh
       - name: Verify isolated provider logic (NO LIVE QUERIES)
         run: node --test tools/flight-unified/normalize.test.mjs
       - name: Python syntax check (NO LIVE QUERIES)
