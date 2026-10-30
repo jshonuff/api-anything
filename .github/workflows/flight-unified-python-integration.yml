@@ -1,0 +1,40 @@
+name: FLIGHT-1 Python FLI + GoWild one-off integration
+on:
+  push:
+    branches:
+      - jc-savage/flight-unified-pilot-20261030
+    paths:
+      - .github/workflows/flight-unified-python-integration.yml
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Python FLI source
+        run: |
+          python -m pip install --quiet "git+https://github.com/jshonuff/fli.git@62eaaed9925c6ea63a606ccdbb74be3040e45d66"
+      - name: Single generic DEN-LAS comparison, private temporary output
+        env:
+          FLI_PYTHON: python
+        run: |
+          set -euo pipefail
+          trap 'rm -f "$RUNNER_TEMP/flight-unified-validation.json"' EXIT
+          node tools/flight-unified/run.mjs DEN LAS 2026-11-01 --nonstop --fli-python > "$RUNNER_TEMP/flight-unified-validation.json"
+          node -e '
+            const fs=require("node:fs");
+            const x=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+"/flight-unified-validation.json","utf8"));
+            const frontier=x.statusByProvider.find(v=>v.provider==="frontier_booking");
+            const google=x.statusByProvider.find(v=>v.provider==="google_flights_python");
+            console.log(JSON.stringify({sources:[frontier,google],unknownProviders:x.problems.map(v=>v.provider),mode:x.status},null,2));
+            if(frontier?.status!=="OBSERVED"||!frontier?.count)process.exit(2);
+            if(google?.status!=="REFERENCE_ONLY"||!google?.count)process.exit(3);
+          '
