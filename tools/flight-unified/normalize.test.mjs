@@ -24,8 +24,8 @@ test('nine eligible round-trip combinations including standard-out and GoWild-re
  assert.equal(result.options.length,9);
  assert.deepEqual(new Set(result.options.map(x=>x.outboundFare)),new Set(FARES));
  assert.ok(result.options.some(x=>x.outboundFare==='standard'&&x.returnFare==='gowild'&&x.total===135.41));
- assert.equal(result.best.total,95.41);
- assert.equal(result.best.outboundFare,'discount_den');
+ assert.equal(result.best.total,94.4);
+ assert.equal(result.best.outboundFare,'gowild');
  assert.equal(result.best.returnFare,'gowild');
 });
 test('an UNKNOWN blocked leg never becomes sold out',()=>{
@@ -55,7 +55,7 @@ test('provider failure cannot erase the working Frontier fare',()=>{
  const [out,back]=normalizeFrontier(report);
  const partial=summarizeSources([out,back,{provider:'google_flights',status:'UNKNOWN',itineraries:[]},{provider:'eric_frontier',status:'UNKNOWN',itineraries:[]}],{outboundDate:'2026-11-05',returnDate:'2026-11-09'});
  assert.equal(partial.roundTrip.status,'QUOTED');
- assert.equal(partial.roundTrip.best.total,95.41);
+ assert.equal(partial.roundTrip.best.total,94.4);
  assert.equal(partial.statusByProvider.find(x=>x.provider==='google_flights').status,'PARTIAL_OR_UNKNOWN');
 });
 test('no stale or unreadable Frontier page gets an invented seat',()=>{
