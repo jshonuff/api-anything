@@ -58,8 +58,14 @@ test('localhost session, static asset allowlist, CSP and refusal of invalid toke
 test('bad host rejected to prevent DNS rebinding',async()=>{
  const {addr,stop}=await listen(async()=>fixture);
  try{
-  const x=await fetch(addr+'/api/session',{headers:{Host:'untrusted.example'}});
-  assert.equal(x.status,403);
+  const {request}=await import('node:http');
+  const result=await new Promise((resolve,reject)=>{
+   const x=request({hostname:'127.0.0.1',port:Number(new URL(addr).port),
+    path:'/api/session',method:'GET',headers:{Host:'untrusted.example'}},
+    res=>{res.resume();res.on('end',()=>resolve(res.statusCode));});
+   x.on('error',reject);x.end();
+  });
+  assert.equal(result,403);
  }finally{await stop();}
 });
 test('one live search at a time; partial source errors do not result in sold-out claims',async()=>{
