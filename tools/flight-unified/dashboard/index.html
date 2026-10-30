@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FLIGHT-1 Flight Comparison Pilot</title>
+<link rel="stylesheet" href="./style.css">
+<script type="module" src="./app.mjs"></script>
+</head>
+<body>
+<header><strong>✈ FLIGHT-1</strong><span>Development-only / local comparison</span></header>
+<main>
+<section class="intro">
+<h1>GoWild + Google Flights</h1>
+<p>One comparison view. Every fare keeps its provider and verification status.</p>
+<label for="dataFile">Load a local search result (JSON)</label>
+<input id="dataFile" type="file" accept=".json,application/json">
+<button id="demo" type="button">Show synthetic demonstration</button>
+<p class="note">No file upload or permanent storage. Checkout verification is manual.</p>
+</section>
+<section id="summary"></section>
+<section id="controls" hidden>
+<label>Source <select id="source"><option value="all">All</option><option value="frontier_booking">Frontier</option><option value="google_flights_python">Google Flights</option></select></label>
+<label>Maximum fare <input id="maxPrice" type="number" min="0"></label>
+<label><input id="onlyNonstop" type="checkbox"> Nonstop</label>
+<label><input id="onlyGoWild" type="checkbox"> Observed GoWild</label>
+</section>
+<p id="message" role="status">Load results to begin.</p>
+<section id="results"></section>
+</main>
+<footer>Source quotes are not checkout totals or guarantees. No bookings or Supabase writes.</footer>
+</body>
+</html>
