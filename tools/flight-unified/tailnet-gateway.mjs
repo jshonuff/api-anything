@@ -50,8 +50,11 @@ export function createTailnetGateway(options){
    if(req.headers.origin!==remoteOrigin)return send(res,403,'INVALID_ORIGIN');
    if(req.headers['content-type']?.split(';')[0]!=='application/json')
     return send(res,415,'JSON_REQUIRED');
-   const len=Number(req.headers['content-length']);
-   if(!Number.isFinite(len)||len<0||len>2048)return send(res,413,'PAYLOAD_TOO_LARGE');
+   const value=req.headers['content-length'];
+   if(value!==undefined){
+    const len=Number(value);
+    if(!Number.isInteger(len)||len<0||len>2048)return send(res,413,'PAYLOAD_TOO_LARGE');
+   }
   }
   const headers={Host:targetHost,'Accept':'application/json, text/html, text/css, text/javascript',
    'Cache-Control':'no-store'};
