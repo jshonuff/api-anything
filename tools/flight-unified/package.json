@@ -4,12 +4,12 @@
   "private": true,
   "type": "module",
   "description": "Development-only FLIGHT-1 multi-provider flight comparison, no Supabase production changes.",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "test": "node --test normalize.test.mjs",
-    "check": "node --check run.mjs && node --check normalize.mjs && node --check alerts.mjs && node --check normalize.test.mjs"
-  },
-  "dependencies": {
-    "fli-js": "0.0.4"
+    "check": "node --check run.mjs && node --check normalize.mjs && node --check alerts.mjs && node --check normalize.test.mjs",
+    "bootstrap:fli": "bash bootstrap-fli.sh"
   }
 }
