@@ -30,7 +30,7 @@ function print(x){console.log(JSON.stringify(x));}
 if(provider==='fli') {
  let stage='IMPORT';
  try {
-  const {Airport,FlightSearchFilters,FlightSegment,MaxStops,SeatType,SortBy,SearchFlights}=await import('fli-js');
+  const {Airport,FlightSearchFilters,FlightSegment,MaxStops,SeatType,SortBy,SearchFlights,Client,parseFirstWrbPayload}=await import('fli-js');
   stage='FILTER';
   const filters=new FlightSearchFilters({passenger_info:{adults:1,children:0,infants_in_seat:0,infants_on_lap:0},
    flight_segments:[new FlightSegment({departure_airport:[[[Airport[origin]??origin,0]]],
@@ -38,8 +38,24 @@ if(provider==='fli') {
    seat_type:SeatType.ECONOMY,stops:MaxStops.NON_STOP,sort_by:SortBy.CHEAPEST,
    bags:{checked_bags:0,carry_on:false}});
   stage='LIVE_FETCH';
-  const results=await new SearchFlights().search(filters,{currency:'USD',topN:5});
-  print({provider,stage,status:Array.isArray(results)&&results.length?'RETRIEVED':'EMPTY_OR_NULL',count:Array.isArray(results)?results.length:0});
+  const diagnostics={};
+  const oneFetch=async (url,opts)=>{
+   const response=await fetch(url,opts);
+   const body=await response.clone().text();
+   diagnostics.httpStatus=response.status;
+   diagnostics.contentType=(response.headers.get('content-type')??'unknown').split(';')[0];
+   diagnostics.format=body.trimStart().startsWith('<')?'HTML':body.includes('wrb.fr')?'GOOGLE_WRB':'OTHER';
+   diagnostics.bodyLengthBucket=body.length>100000?'LARGE':body.length>10000?'MEDIUM':'SMALL';
+   const inner=parseFirstWrbPayload(body);
+   diagnostics.hasParsedChunk=inner!==null;
+   diagnostics.innerIsArray=Array.isArray(inner);
+   diagnostics.block2IsArray=Array.isArray(inner?.[2]?.[0]);
+   diagnostics.block3IsArray=Array.isArray(inner?.[3]?.[0]);
+   return response;
+  };
+  const results=await new SearchFlights(new Client({fetchImpl:oneFetch,retries:1})).search(filters,{currency:'USD',topN:5});
+  print({provider,stage,status:Array.isArray(results)&&results.length?'RETRIEVED':'EMPTY_OR_NULL',
+    count:Array.isArray(results)?results.length:0,diagnostics});
  }catch(e){
   const issuePaths=Array.isArray(e.issues)?e.issues.map(i=>i.path?.join('.')||'root').slice(0,5):[];
   print({provider,stage,status:'ERROR',name:e?.name??'Error',code:typeof e?.code==='string'?e.code:null,
