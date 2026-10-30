@@ -29,9 +29,14 @@ jobs:
           node --check tools/flight-unified/normalize.test.mjs
           node --check tools/flight-unified/diagnose.mjs
           node --check tools/flight-unified/compare-ui.mjs
-          node --check tools/flight-unified/compare-ui.test.mjs
+          node --check tools/flight-unified/compare-ui.test.mjs tools/flight-unified/local-server.test.mjs
           node --check tools/flight-unified/dashboard/app.mjs
           node --check tools/flight-unified/dashboard/demo.mjs
+          node --check tools/flight-unified/local-search.mjs
+          node --check tools/flight-unified/local-server.mjs
+          node --check tools/flight-unified/start-local.mjs
+          node --check tools/flight-unified/local-server.test.mjs
+          node --check tools/flight-unified/local-ui-smoke.mjs
       - name: Build pinned FLI-JS from source (NO LIVE QUERIES)
         run: bash tools/flight-unified/bootstrap-fli.sh
       - name: Verify isolated provider logic (NO LIVE QUERIES)
