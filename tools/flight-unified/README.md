@@ -18,7 +18,7 @@ node tools/flight-unified/run.mjs DFW DEN 2026-11-05 --return 2026-11-09 --nonst
 node --test tools/flight-unified/normalize.test.mjs
 ```
 
-Optional FLI-JS: install the reviewed `fli-js` package within `tools/flight-unified` (pin to the reviewed version), then add `--fli`. Optional Eric Python: install MIT-licensed `ericchansen/flights` in a Python 3.12+ virtualenv, set `FLIGHT_PYTHON` to its interpreter and add `--eric`. Each optional adapter is **independent**: its failure is UNKNOWN and cannot remove valid Frontier observations.
+Optional FLI-JS: run `npm install --prefix tools/flight-unified` to install the manifest-pinned `fli-js@0.0.4` package, then add `--fli`. The package installation and live Google response path are not yet independently validated; no lockfile has been generated. Optional Eric Python: install MIT-licensed `ericchansen/flights` in a Python 3.12+ virtualenv, set `FLIGHT_PYTHON` to its interpreter and add `--eric`. Each optional adapter is **independent**: its failure is UNKNOWN and cannot remove valid Frontier observations.
 
 *Note:* Google/Frontier third-party endpoints are undocumented and may break. Neither FLI nor the Python provider has been independently live-tested by this pilot. Do not activate scheduled crawling.
 
@@ -47,7 +47,7 @@ Optional FLI-JS: install the reviewed `fli-js` package within `tools/flight-unif
 - [x] Reviewed source and license of Eric Hansen `flights` (MIT).
 - [x] Baseline GoWild checker had an earlier independent live read from Frontier (2026-10-27).
 - [x] Deterministic unit tests defined for 9 combinations, sentinel `-1`, unknown/blocked, baggage profile, provider isolation.
-- [ ] GitHub CI green on pilot branch.
+- [x] Offline GitHub CI green on pilot branch (9 tests passed, 0 failed): https://github.com/jshonuff/api-anything/actions/runs/41077394553
 - [ ] FLI-JS live adapter verified (one route only).
 - [ ] Eric Python adapter verified (one route only).
 - [ ] Combined one-route comparison reconciled independently with actual checkout.
