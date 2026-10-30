@@ -1,0 +1,30 @@
+name: FLIGHT-1 optional adapter diagnostics (one-off)
+on:
+  push:
+    branches:
+      - jc-savage/flight-unified-pilot-20261030
+    paths:
+      - .github/workflows/flight-unified-adapter-diagnostics.yml
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and import reviewed FLI-JS
+        run: bash tools/flight-unified/bootstrap-fli.sh
+      - name: Install pinned Python dependency
+        run: |
+          python3 -m venv "$RUNNER_TEMP/flight-python"
+          "$RUNNER_TEMP/flight-python/bin/python" -m pip install --quiet "git+https://github.com/ericchansen/flights.git@090f4247dc334aa8a6fc240fc0b7633fe4f962d8"
+      - name: FLI diagnostic — one generic route
+        run: node tools/flight-unified/diagnose.mjs fli DEN LAS 2026-11-01
+      - name: Eric diagnostic — one generic route
+        env:
+          FLIGHT_PYTHON: ${{ runner.temp }}/flight-python/bin/python
+        run: node tools/flight-unified/diagnose.mjs eric DEN LAS 2026-11-01
