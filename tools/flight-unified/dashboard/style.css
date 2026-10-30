@@ -1,0 +1,31 @@
+/* Local-only flight-comparison pilot; no external fonts or tracking */
+:root{color-scheme:dark;font:15px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#071322;color:#f0f7ff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(165deg,#061c27 0,#071322 45%,#0b1020 100%);min-height:100vh}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px max(22px,calc((100vw - 1120px)/2));background:#0d222c;border-bottom:1px solid #22434c}
+header strong{font-size:1.35rem;letter-spacing:.09em;color:#85f9d9}header span{font-size:.78rem;letter-spacing:.08em;color:#d7e6f2}
+main{max-width:1120px;margin:0 auto;padding:44px 20px 90px}
+.intro{padding:42px;border:1px solid #21434b;border-radius:24px;background:radial-gradient(circle at 75% 10%,#123e45,transparent 65%),#0b2630;box-shadow:0 28px 55px #0004}
+h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1.05;letter-spacing:-.04em;margin:0 0 12px}
+.intro p{max-width:700px;color:#b5cad5;font-size:1.1rem}
+.intro label{display:block;margin:20px 0 6px;font-weight:650}
+input[type=file]{max-width:100%;padding:11px;background:#0a1724;border:1px dashed #58b7b8;border-radius:9px}
+button{border:1px solid #40bca5;background:#0b5148;color:white;padding:10px 14px;border-radius:9px;font-weight:700;cursor:pointer;margin:5px}
+button:hover{background:#137667}button:disabled{opacity:.4;cursor:not-allowed}
+.note,.muted{color:#abc0cc} .note{font-size:.86rem!important}
+.overview{background:#132534;border:1px solid #315161;border-radius:16px;padding:22px;margin:28px 0}
+.overview h2{margin:0;color:#8df2df;font-size:1.15rem}.overview p{margin:7px 0;color:#dfebf0}
+#controls{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:23px 0;padding:16px;border:1px solid #244250;border-radius:12px;background:#0b1d2b}
+#controls label{font-size:.88rem;color:#d1e6ee}#controls input[type=number],#controls select{display:block;border:1px solid #486674;background:#071722;color:#f5fbff;padding:8px;border-radius:8px;max-width:160px}
+#message{color:#b2d4de;margin:20px 3px}
+#results{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,470px),1fr));gap:18px;align-items:start}
+.card{padding:22px;background:#132332;border:1px solid #2e4659;border-radius:16px;box-shadow:0 16px 32px #0003}
+.card h3{margin:0;color:#a3f8e6;font-size:1.35rem}.card>.muted{margin:6px 0 10px;font-size:.88rem}
+.label{font-size:.87rem;color:#8dd0c3}
+.fare{background:#0c1b28;border:1px solid #27495b;border-radius:12px;padding:14px;margin-top:11px}
+.fare-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.fare-head strong{color:#f9fdfd}.fare-head span{color:#9ac2d0;font-size:.73rem}
+.fare .muted{font-size:.75rem;margin:4px 0 12px}
+.fare label{display:block;color:#c5deeb;font-size:.81rem;margin:7px 0}
+.fare label input[type=number]{display:block;margin:6px 0 0;padding:9px;background:#101e2f;border:1px solid #446473;border-radius:8px;color:white;width:100%;max-width:240px}
+.verification{color:#81d7b9;font-size:.81rem}
+footer{border-top:1px solid #23434e;padding:22px;color:#8ca7b7;text-align:center;font-size:.83rem}
+@media(max-width:600px){main{padding:25px 14px 45px}.intro{padding:26px 18px}header{padding:16px}header span{font-size:.66rem}#controls{gap:12px}.card{padding:15px}}
