@@ -22,7 +22,7 @@ Optional FLI-JS: install the reviewed `fli-js` package within `tools/flight-unif
 
 *Note:* Google/Frontier third-party endpoints are undocumented and may break. Neither FLI nor the Python provider has been independently live-tested by this pilot. Do not activate scheduled crawling.
 
-## Pricing policy
+## Alert preview\nThe independent `alerts.mjs` selector borrows **concepts only** (not source code) from GoWild Matcher: fresh observations, strict provider provenance, optional price thresholds, and price-key deduplication. The runner emits `alertCandidates` locally, but **never sends Telegram/WhatsApp messages, creates schedules, or writes an index**. Only fresh, observed GoWild fares qualify; stale or unknown sources are excluded.\n\n## Pricing policy
 - **1 adult**, **one under-seat personal item**, **no overhead carry-on**, **no checked bag**.
 - Frontier Elite Silver: standard seat when eligible/available without a standard-seat surcharge.
 - Compare **all nine** eligible outbound/return fare-type combinations: GoWild, Discount Den, Standard in each direction.
