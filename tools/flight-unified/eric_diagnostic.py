@@ -18,8 +18,25 @@ def classify(exc):
     if re.search(r"ssl|connection|proxy|socket|network", msg): return "NETWORK"
     return "UNCLASSIFIED"
 
-stage = "IMPORT"
+stage = "CONFIG_PROBE"
 try:
+    import requests
+    env_resp = requests.get("https://www2.flyfrontier.com/api/environment", timeout=25)
+    meta = {"httpStatus": env_resp.status_code,
+            "contentType": env_resp.headers.get("content-type", "unknown").split(";")[0]}
+    try:
+        env_obj = env_resp.json()
+        meta["isJsonObject"] = isinstance(env_obj, dict)
+        meta["hasConfigKeys"] = isinstance(env_obj, dict) and "BFF_SUBSCRIPTION_KEY" in env_obj
+    except ValueError:
+        print(json.dumps({"status":"ERROR","stage":stage,
+          "name":"JSONDecodeError","class":"NON_JSON_CONFIG_RESPONSE",**meta}))
+        raise SystemExit(0)
+    if env_resp.status_code != 200 or not meta["hasConfigKeys"]:
+        print(json.dumps({"status":"ERROR","stage":stage,
+          "name":"UnexpectedConfigResponse","class":"CONFIG_MISSING_OR_UNAVAILABLE",**meta}))
+        raise SystemExit(0)
+    stage = "IMPORT"
     from flights import get_provider
     stage = "INITIALIZE"
     provider = get_provider("frontier")
