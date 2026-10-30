@@ -1,0 +1,23 @@
+name: FLIGHT-1 local UI smoke
+on:
+  push:
+    branches: [jc-savage/flight-unified-pilot-20261030]
+    paths: [.github/workflows/flight-unified-ui-smoke.yml]
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser testing package
+        run: npm install --prefix tools/flight-unified --no-save playwright
+      - name: Verify dashboard with synthetic sample
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory tools/flight-unified > /dev/null 2>&1 &
+          sleep 2
+          node tools/flight-unified/dashboard/ui-smoke.mjs
