@@ -73,6 +73,30 @@ Open `http://127.0.0.1:8765/dashboard/` and select the privately saved JSON file
 
 Verified offline CI: **18/18 tests passing** on https://github.com/jshonuff/api-anything/actions/runs/41112786143. Interactive browser test PASSED with synthetic data (2 cards, source filtering, manual checkout delta, no JavaScript errors): https://github.com/jshonuff/api-anything/actions/runs/41113159289. This does not verify real checkout prices.
 
+## One-command private search dashboard (development)
+
+The verified GoWild + original Python FLI pair is wired to the dashboard through a **localhost-only** server. The UI now provides airport, departure date, optional return date and nonstop selection. A new search runs only when the user presses Search; live sources may return UNKNOWN. No external cloud hosting, login, booking, alerts or Supabase write.
+
+**One-time local dependency setup** from repository root (Python 3 required):
+
+```sh
+bash tools/flight-unified/setup-local.sh
+```
+
+**Launch the dashboard** whenever needed:
+
+```sh
+node tools/flight-unified/start-local.mjs
+```
+
+On the same machine, visit `http://127.0.0.1:8765/dashboard/`, choose airports and date, then press **Search Frontier + Google Flights**. No JSON import is necessary. The optional manual JSON import and synthetic demonstration still work.
+
+The isolated Python virtualenv is gitignored. If already installed elsewhere, set `FLI_PYTHON` to its interpreter instead of running setup. No public GitHub Action is used for personal searches. The dashboard is accessible **only on the computer running the server**; this is not a hosted iPhone application.
+
+**Security boundary:** Server binds only `127.0.0.1`, validates Host, Origin and per-process same-origin token, accepts one bounded POST search at a time, requires strict three-letter IATA airport codes and valid near-future dates, invokes the runner without shell expansion, serves only whitelisted static assets, sends no-store / content-security headers, and returns sanitized errors. It stores neither JSON fare files nor credentials; the original GoWild script uses a temporary directory that is removed after each search. Do not expose the port via tunnels, proxies or port forwarding.
+
+**Validated** with simulated providers: HTTP input/authorization tests and headless Chromium interactive search, without live airline calls in CI. A locally run real search still requires installing the Python dependency and observing provider-specific behavior; no checkout or actual booking has been verified. Existing FLIGHT-1 production dispatch remains disabled.
+
 ## Remaining promotion gates
 
 - Review and independently reconcile selected fares with actual checkout and fare inclusions.
