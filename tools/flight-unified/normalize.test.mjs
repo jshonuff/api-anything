@@ -74,3 +74,15 @@ test('alerts use only fresh observed GoWild fares, never candidates or stale sna
  assert.equal(events[0].delivery,'NOT_SENT');
  assert.equal(selectAlertCandidates([fresh],{now:'2026-11-05T00:15:00Z',maxFare:80}).length,0);
 });
+
+test('Python FLI alternate produces a source-attributed Google cash quote only',()=>{
+ const rows=[{price:88.5,currency:'USD',stops:0,legs:[{airline:'WN',flight_number:'123',
+   departure_datetime:'2026-11-01T12:00:00',arrival_datetime:'2026-11-01T13:00:00'}]}];
+ const normalized=normalizeFli(rows,{origin:'DEN',destination:'LAS',date:'2026-11-01',
+  provider:'google_flights_python',checkedAt:'2026-10-30T15:00:00Z'});
+ assert.equal(normalized.status,'REFERENCE_ONLY');
+ assert.equal(normalized.provider,'google_flights_python');
+ assert.equal(normalized.itineraries[0].provider,'google_flights_python');
+ assert.equal(normalized.itineraries[0].fares.google_cash,88.5);
+ assert.equal(normalized.itineraries[0].fares.gowild,undefined);
+});
