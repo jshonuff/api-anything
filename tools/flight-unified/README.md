@@ -54,12 +54,31 @@ The original GoWild script is unchanged; it caps searches at 12 route/date reque
 - **Combined one-route pilot: Frontier 5 observed flight records + Python FLI 23 Google results, zero provider errors**: https://github.com/jshonuff/api-anything/actions/runs/41085302160
 - Core normalization and fail-safe tests cover 9-way fare comparisons, no-seat sentinel, unknowns, fallback and personal-item-only profile. Offline CI must remain green before further changes.
 
+## Local comparison dashboard (development)
+
+The standalone `dashboard/` interface reads the unified runner's JSON **inside the current browser tab**; it does not upload, publish, transmit or automatically persist it. It shows provider-specific quotes, precise matched-itinerary deduplication, fare filters and **manual** checkout reconciliation. In the menu, choose **Show synthetic demonstration** to explore without real travel data.
+
+From the repository root:
+
+```sh
+node tools/flight-unified/run.mjs DEN LAS 2026-11-05 --nonstop --fli > ~/flight-search-private.json
+python3 -m http.server 8765 --bind 127.0.0.1 --directory tools/flight-unified
+```
+
+Open `http://127.0.0.1:8765/dashboard/` and select the privately saved JSON file. The dashboard uses local ES modules, so opening the HTML directly with `file://` may fail browser security restrictions. Keep this server bound to loopback; do not host private results in the public repository. Delete the private JSON when no longer needed.
+
+**Deduplication contract:** Only group the same route, travel date, carrier/flight number (including Frontier `FR` → `F9` alias), and compatible exact local departure timestamp with matching timezone representation. Ambiguous flight identities stay separate. Even when grouped, GoWild / Discount Den / standard / Google fares remain separately attributed; Google never proves a GoWild seat.
+
+**Checkout reconciliation:** The viewer must enter the total actually displayed at airline checkout and explicitly attest to checking the identical itinerary and fare. The interface reports a price difference, *not* an airline verification API, ticket purchase, or guaranteed booking. No checkout details are sent to Supabase.
+
+Verified offline CI: **18/18 tests passing** on https://github.com/jshonuff/api-anything/actions/runs/41112786143. A full interactive browser smoke test is a separate acceptance gate.
+
 ## Remaining promotion gates
 
 - Review and independently reconcile selected fares with actual checkout and fare inclusions.
 - Apply date-aware booking eligibility and ensure round-trip choices are genuinely bookable when recommended.
 - Confirm reliable Google Flights Python response across more than one route/date without excessive queries.
-- Build the combined dashboard (reuse original Frontier Finder's UI only; not its duplicate scraper).
+- [x] Local no-upload comparison dashboard built; [ ] interactive browser QA and private deployment approval remain.
 - Design private execution and the existing FLIGHT-1 authorized persistence/notification path.
 - Recheck live Supabase authority and obtain explicit promotion approval before any production activation.
 
