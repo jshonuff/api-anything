@@ -18,7 +18,7 @@ node tools/flight-unified/run.mjs DFW DEN 2026-11-05 --return 2026-11-09 --nonst
 node --test tools/flight-unified/normalize.test.mjs
 ```
 
-Optional FLI-JS: run `npm install --prefix tools/flight-unified` to install the manifest-pinned `fli-js@0.0.4` package, then add `--fli`. The package installation and live Google response path are not yet independently validated; no lockfile has been generated. Optional Eric Python: install MIT-licensed `ericchansen/flights` in a Python 3.12+ virtualenv, set `FLIGHT_PYTHON` to its interpreter and add `--eric`. Each optional adapter is **independent**: its failure is UNKNOWN and cannot remove valid Frontier observations.
+Optional FLI-JS: the version in the checked GitHub source is not published on npm. Run `bash tools/flight-unified/bootstrap-fli.sh`; it builds the MIT-licensed FLI-JS from source pinned to Git commit `62eaaed9925c6ea63a606ccdbb74be3040e45d66`, installs a local tarball into this development adapter, and verifies the import. Then add `--fli`. A live Google Flights response is still an independent acceptance gate. Optional Eric Python: install MIT-licensed `ericchansen/flights` in a Python 3.12+ virtualenv, set `FLIGHT_PYTHON` to its interpreter and add `--eric`. Each optional adapter is **independent**: its failure is UNKNOWN and cannot remove valid Frontier observations.
 
 *Note:* Google/Frontier third-party endpoints are undocumented and may break. Neither FLI nor the Python provider has been independently live-tested by this pilot. Do not activate scheduled crawling.
 
@@ -47,7 +47,7 @@ Optional FLI-JS: run `npm install --prefix tools/flight-unified` to install the 
 - [x] Reviewed source and license of Eric Hansen `flights` (MIT).
 - [x] Baseline GoWild checker had an earlier independent live read from Frontier (2026-10-27).
 - [x] Deterministic unit tests defined for 9 combinations, sentinel `-1`, unknown/blocked, baggage profile, provider isolation.
-- [x] Offline GitHub CI green on pilot branch (9 tests passed, 0 failed): https://github.com/jshonuff/api-anything/actions/runs/41077394553
+- [x] Offline core verification passed (9 tests, 0 failures): https://github.com/jshonuff/api-anything/actions/runs/41077394553\n- [ ] Pinned FLI-JS source build and import verified on GitHub Actions.
 - [ ] FLI-JS live adapter verified (one route only).
 - [ ] Eric Python adapter verified (one route only).
 - [ ] Combined one-route comparison reconciled independently with actual checkout.
