@@ -31,3 +31,12 @@ footer{border-top:1px solid #23434e;padding:22px;color:#8ca7b7;text-align:center
 @media(max-width:600px){main{padding:25px 14px 45px}.intro{padding:26px 18px}header{padding:16px}header span{font-size:.66rem}#controls{gap:12px}.card{padding:15px}}
 
 #controls[hidden]{display:none}
+
+.search-form{padding:17px 0 22px}
+.search-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.search-fields label{color:#d8eaf0}
+.search-fields input{display:block;width:100%;padding:10px;margin-top:6px;color:#fff;background:#101e2c;border:1px solid #4e737f;border-radius:8px;font:inherit}
+.search-form>label{display:flex;align-items:center;gap:9px}
+.search-form button{margin:15px 0 0}
+.search-form button:disabled{opacity:.45}
+.intro hr{border:0;border-top:1px solid #38525e;margin:15px 0}
