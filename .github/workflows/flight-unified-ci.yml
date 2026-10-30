@@ -29,7 +29,7 @@ jobs:
           node --check tools/flight-unified/normalize.test.mjs
           node --check tools/flight-unified/diagnose.mjs
           node --check tools/flight-unified/compare-ui.mjs
-          node --check tools/flight-unified/compare-ui.test.mjs tools/flight-unified/local-server.test.mjs
+          node --check tools/flight-unified/compare-ui.test.mjs
           node --check tools/flight-unified/dashboard/app.mjs
           node --check tools/flight-unified/dashboard/demo.mjs
           node --check tools/flight-unified/local-search.mjs
@@ -40,6 +40,6 @@ jobs:
       - name: Build pinned FLI-JS from source (NO LIVE QUERIES)
         run: bash tools/flight-unified/bootstrap-fli.sh
       - name: Verify isolated provider logic (NO LIVE QUERIES)
-        run: node --test tools/flight-unified/normalize.test.mjs tools/flight-unified/compare-ui.test.mjs
+        run: node --test tools/flight-unified/normalize.test.mjs tools/flight-unified/compare-ui.test.mjs tools/flight-unified/local-server.test.mjs
       - name: Python syntax check (NO LIVE QUERIES)
         run: python3 -m py_compile tools/flight-unified/eric_bridge.py tools/flight-unified/fli_python_bridge.py tools/flight-unified/eric_diagnostic.py
