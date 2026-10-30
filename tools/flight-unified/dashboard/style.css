@@ -29,3 +29,5 @@ button:hover{background:#137667}button:disabled{opacity:.4;cursor:not-allowed}
 .verification{color:#81d7b9;font-size:.81rem}
 footer{border-top:1px solid #23434e;padding:22px;color:#8ca7b7;text-align:center;font-size:.83rem}
 @media(max-width:600px){main{padding:25px 14px 45px}.intro{padding:26px 18px}header{padding:16px}header span{font-size:.66rem}#controls{gap:12px}.card{padding:15px}}
+
+#controls[hidden]{display:none}
