@@ -73,10 +73,8 @@ try {
   const data=JSON.parse(stdout);
   if(!Array.isArray(data))throw new Error('Unexpected Python FLI response');
   if(!data.length)throw new Error('No Python FLI flights returned');
-  const normalizedFli=normalizeFli(data,{origin:r.from,destination:r.to,date:r.date,checkedAt:new Date().toISOString()});
-  normalizedFli.provider='google_flights_python';
-  normalizedFli.itineraries=normalizedFli.itineraries.map(f=>({...f,provider:'google_flights_python'}));
-  normalized.push(normalizedFli);
+  normalized.push(normalizeFli(data,{origin:r.from,destination:r.to,date:r.date,
+   checkedAt:new Date().toISOString(),provider:'google_flights_python'}));
  }catch(e){
   problems.push({provider:'google_flights_python',status:'UNKNOWN',reason:'PROVIDER_UNAVAILABLE_OR_NO_RESULTS'});
   normalized.push({provider:'google_flights_python',origin:r.from,destination:r.to,date:r.date,status:'UNKNOWN',itineraries:[]});
