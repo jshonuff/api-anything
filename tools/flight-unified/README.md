@@ -71,14 +71,14 @@ Open `http://127.0.0.1:8765/dashboard/` and select the privately saved JSON file
 
 **Checkout reconciliation:** The viewer must enter the total actually displayed at airline checkout and explicitly attest to checking the identical itinerary and fare. The interface reports a price difference, *not* an airline verification API, ticket purchase, or guaranteed booking. No checkout details are sent to Supabase.
 
-Verified offline CI: **18/18 tests passing** on https://github.com/jshonuff/api-anything/actions/runs/41112786143. A full interactive browser smoke test is a separate acceptance gate.
+Verified offline CI: **18/18 tests passing** on https://github.com/jshonuff/api-anything/actions/runs/41112786143. Interactive browser test PASSED with synthetic data (2 cards, source filtering, manual checkout delta, no JavaScript errors): https://github.com/jshonuff/api-anything/actions/runs/41113159289. This does not verify real checkout prices.
 
 ## Remaining promotion gates
 
 - Review and independently reconcile selected fares with actual checkout and fare inclusions.
 - Apply date-aware booking eligibility and ensure round-trip choices are genuinely bookable when recommended.
 - Confirm reliable Google Flights Python response across more than one route/date without excessive queries.
-- [x] Local no-upload comparison dashboard built; [ ] interactive browser QA and private deployment approval remain.
+- [x] Local no-upload comparison dashboard and synthetic Chromium smoke test passed; [ ] real checkout reconciliation and private deployment approval remain.
 - Design private execution and the existing FLIGHT-1 authorized persistence/notification path.
 - Recheck live Supabase authority and obtain explicit promotion approval before any production activation.
 
