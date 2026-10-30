@@ -27,9 +27,10 @@ jobs:
           node --check tools/flight-unified/run.mjs
           node --check tools/flight-unified/alerts.mjs
           node --check tools/flight-unified/normalize.test.mjs
+          node --check tools/flight-unified/diagnose.mjs
       - name: Build pinned FLI-JS from source (NO LIVE QUERIES)
         run: bash tools/flight-unified/bootstrap-fli.sh
       - name: Verify isolated provider logic (NO LIVE QUERIES)
         run: node --test tools/flight-unified/normalize.test.mjs
       - name: Python syntax check (NO LIVE QUERIES)
-        run: python3 -m py_compile tools/flight-unified/eric_bridge.py
+        run: python3 -m py_compile tools/flight-unified/eric_bridge.py tools/flight-unified/fli_python_bridge.py tools/flight-unified/eric_diagnostic.py
