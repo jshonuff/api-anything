@@ -1,0 +1,42 @@
+name: FLIGHT-1 one-off live integration probe (generic route)
+
+on:
+  push:
+    branches:
+      - jc-savage/flight-unified-pilot-20261030
+    paths:
+      - .github/workflows/flight-unified-live-oneoff.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build pinned FLI-JS (no queries)
+        run: bash tools/flight-unified/bootstrap-fli.sh
+      - name: Install pinned Eric Python provider (no queries)
+        continue-on-error: true
+        run: |
+          python3 -m venv "$RUNNER_TEMP/flight-python"
+          "$RUNNER_TEMP/flight-python/bin/python" -m pip install --quiet "git+https://github.com/ericchansen/flights.git@090f4247dc334aa8a6fc240fc0b7633fe4f962d8"
+      - name: Probe one generic route with private temp output
+        env:
+          FLIGHT_PYTHON: ${{ runner.temp }}/flight-python/bin/python
+        run: |
+          set -euo pipefail
+          node tools/flight-unified/run.mjs DEN LAS 2026-10-31 --nonstop --fli --eric > "$RUNNER_TEMP/flight-probe.json"
+          node -e '
+            const fs=require("node:fs");
+            const x=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+"/flight-probe.json","utf8"));
+            const providerStatuses=x.statusByProvider.map(v=>({provider:v.provider,status:v.status,results:v.count}));
+            console.log(JSON.stringify({providerStatuses,errors:x.problems.map(v=>v.provider),developmentOnly:x.status},null,2));
+            if (!providerStatuses.find(v=>v.provider==="frontier_booking")) process.exit(1);
+          '
+          rm -f "$RUNNER_TEMP/flight-probe.json"
