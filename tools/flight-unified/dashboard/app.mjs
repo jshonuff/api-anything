@@ -73,3 +73,36 @@ for(const id of ['source','maxPrice','onlyNonstop','onlyGoWild'])
 $('demo').addEventListener('click',async()=>{
  const {demo}=await import('./demo.mjs');openData(demo);
 });
+
+$('searchForm').addEventListener('submit',async event=>{
+ event.preventDefault();
+ const button=$('searchButton');
+ if(button.disabled)return;
+ const request={
+  origin:$('searchOrigin').value.trim().toUpperCase(),
+  destination:$('searchDestination').value.trim().toUpperCase(),
+  date:$('searchDate').value,
+  returnDate:$('searchReturn').value||null,
+  nonstop:$('searchNonstop').checked
+ };
+ button.disabled=true;
+ $('message').textContent='Searching both flight providers. Results are not guaranteed until checkout.';
+ try{
+  const sessionResponse=await fetch('/api/session',{cache:'no-store',credentials:'omit'});
+  if(!sessionResponse.ok)throw Error('This page is not running on the FLIGHT-1 local search server.');
+  const {token}=await sessionResponse.json();
+  if(typeof token!=='string')throw Error('Local search authorization unavailable.');
+  const response=await fetch('/api/search',{
+   method:'POST',cache:'no-store',credentials:'omit',
+   headers:{'Content-Type':'application/json','X-Flight-Local-Token':token},
+   body:JSON.stringify(request)
+  });
+  const data=await response.json();
+  if(!response.ok)throw Error(data.error==='SEARCH_ALREADY_RUNNING'?
+   'A search is already running. Finish that one before starting another.':
+   'Search unavailable. The source may have changed or blocked a request; this is not a sold-out result.');
+  openData(data);
+ }catch(error){
+  $('message').textContent=error.message||'No verified results. Try again later.';
+ }finally{button.disabled=false;}
+});
