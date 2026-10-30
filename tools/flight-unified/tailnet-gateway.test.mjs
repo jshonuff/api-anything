@@ -99,3 +99,21 @@ test('oversized payload denied before it reaches flight provider',async()=>{
   assert.equal(x.status,413,x.body);assert.equal(calls(),0);
  });
 });
+
+test('chunked mobile POST without length remains bounded and can search',async()=>{
+ await withServers(async({port,calls})=>{
+  const response=await new Promise((resolve,reject)=>{
+   const req=http.request({hostname:'127.0.0.1',port,method:'POST',path:'/api/search',
+    headers:{Host:host,'Tailscale-User-Login':user,'X-Forwarded-Proto':'https',
+      Origin:'https://'+host,'Content-Type':'application/json',
+      'X-Flight-Local-Token':'X'.repeat(64),'Transfer-Encoding':'chunked'}},res=>{
+    const chunks=[];res.on('data',b=>chunks.push(b));res.on('end',()=>resolve({
+     status:res.statusCode,body:Buffer.concat(chunks).toString('utf8')}));
+   });
+   req.on('error',reject);
+   req.write(payload.slice(0,18));req.end(payload.slice(18));
+  });
+  assert.equal(response.status,200,response.body);
+  assert.equal(calls(),1);
+ });
+});
