@@ -24,7 +24,8 @@ jobs:
       - name: Static JS syntax verification (NO LIVE QUERIES)
         run: |
           node --check tools/flight-unified/normalize.mjs
-          node --check tools/flight-unified/run.mjs\n          node --check tools/flight-unified/alerts.mjs
+          node --check tools/flight-unified/run.mjs
+          node --check tools/flight-unified/alerts.mjs
           node --check tools/flight-unified/normalize.test.mjs
       - name: Verify isolated provider logic (NO LIVE QUERIES)
         run: node --test tools/flight-unified/normalize.test.mjs
