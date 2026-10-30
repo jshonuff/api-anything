@@ -1,71 +1,66 @@
-# JC-SAVAGE FLIGHT-1 Unified Flight Search (Development Pilot)
+# JC-SAVAGE FLIGHT-1 Unified Flight Search — Development Pilot
 
-**Status:** Development-only. Not deployed, not connected to Supabase, not a booking system.
+**Status: working two-provider live pilot, NOT production.** Current owners and dispatch gates remain in live Supabase. No Supabase changes, logins, bookings, deployed dashboards, alert delivery, or scheduled live crawling.
 
-## Design
-One request, independently handled by three providers:
-1. **Proven Frontier booking-page GoWild checker**: the unchanged `../gowild-check/gowild-check.js` remains the *only* adapter permitted to label GoWild as observed. Uses its existing session-cookie redirect and safe parsing. Reads reports from an ephemeral temp directory; no production mutation.
-2. **Google Flights via FLI-JS**: optional `--fli` broad-market cash-fare comparison. Google Flights does not confirm Frontier GoWild seats.
-3. **Eric Hansen's `flights` Python SDK**: optional `--eric` independent Frontier route/fare cross-check. Its `saver_fare` is a **candidate**, not a bookable GoWild guarantee.
+## Verified architecture
 
-The prior `frontierGoWildFlightFinder` repo may contribute the UI / route discovery later, but **do not operate its duplicate high-volume scraper**. It is not a dependency of this pilot.
+| Adapter | Mode | Verification |
+|---|---|---|
+| Existing `../gowild-check/gowild-check.js` | Mandatory Frontier fare/seat observation | Live success, unchanged |
+| Original FLI Python (`--fli`) | Google Flights cash-fare comparison | Live success Oct 30 |
+| TypeScript FLI-JS (`--fli-js`) | Optional experimental Google comparison | Source builds, but live parser returned no usable rows |
+| Eric Hansen Python SDK (`--eric`) | Optional Frontier cross-check only | HTTP 200 returned HTML where SDK expected JSON config |
+| Original Frontier Finder dashboard | Possible later UI source | Not integrated; original bulk scraper must not run in parallel |
 
-## Run locally (no booking, no login)
-Requires Node.js 22+:
+**Only the existing Frontier booking-page checker can classify a GoWild fare as observed.** Google Flights rows are general airfare references, not GoWild seat confirmation. Eric's `saver_fare` is a candidate only. Provider failure is UNKNOWN, not sold out.
+
+## Quick start — verified pairing
+
+Requirements: Node.js 22+, Python 3.12+ and FLI from reviewed source commit.
 
 ```sh
-node tools/flight-unified/run.mjs DFW DEN 2026-11-05 --return 2026-11-09 --nonstop
-node --test tools/flight-unified/normalize.test.mjs
+python -m pip install "git+https://github.com/jshonuff/fli.git@62eaaed9925c6ea63a606ccdbb74be3040e45d66"
+node tools/flight-unified/run.mjs DEN LAS 2026-11-01 --nonstop --fli
 ```
 
-Optional FLI-JS: the version in the checked GitHub source is not published on npm. Run `bash tools/flight-unified/bootstrap-fli.sh`; it builds the MIT-licensed FLI-JS from source pinned to Git commit `62eaaed9925c6ea63a606ccdbb74be3040e45d66`, installs a local tarball into this development adapter, and verifies the import. Then add `--fli`. A live Google Flights response is still an independent acceptance gate. Optional Eric Python: install MIT-licensed `ericchansen/flights` in a Python 3.12+ virtualenv, set `FLIGHT_PYTHON` to its interpreter and add `--eric`. Each optional adapter is **independent**: its failure is UNKNOWN and cannot remove valid Frontier observations.
+If Python is elsewhere, set `FLI_PYTHON` to that interpreter. For return comparison, append `--return YYYY-MM-DD`. The CLI emits JSON locally; treat it as private. No transactions occur.
 
-*Note:* Google/Frontier third-party endpoints are undocumented and may break. Neither FLI nor the Python provider has been independently live-tested by this pilot. Do not activate scheduled crawling.
+`--fli-js` is a separate development-only opt-in. FLI-JS is not available on npm at the reviewed version; run `bash tools/flight-unified/bootstrap-fli.sh` to build from pinned GitHub source before using it. `--eric` needs an independently installed MIT-licensed `ericchansen/flights` virtual environment and `FLIGHT_PYTHON`. **Neither experimental adapter is required for the working two-provider search.**
 
-## Alert preview\nThe independent `alerts.mjs` selector borrows **concepts only** (not source code) from GoWild Matcher: fresh observations, strict provider provenance, optional price thresholds, and price-key deduplication. The runner emits `alertCandidates` locally, but **never sends Telegram/WhatsApp messages, creates schedules, or writes an index**. Only fresh, observed GoWild fares qualify; stale or unknown sources are excluded.\n\n## Pricing policy
-- **1 adult**, **one under-seat personal item**, **no overhead carry-on**, **no checked bag**.
-- Frontier Elite Silver: standard seat when eligible/available without a standard-seat surcharge.
-- Compare **all nine** eligible outbound/return fare-type combinations: GoWild, Discount Den, Standard in each direction.
-- If a specific fare is missing, keep that option unavailable to *calculate*, not "sold out".
-- All amounts come from the source response; **never double-add taxes or government fees**.
-- Membership purchases are sunk costs; do not add them to marginal airfare.
-- Final checkout can still differ. Label results as point-in-time fare observations, not guaranteed bookings.
-- Existing GoWild booking windows, blackout dates, pass eligibility, Frontier site changes, and any itinerary-specific add-ons still apply.
-- Compare Google Flights alternatives separately until fare inclusions and ancillary fees are verified. The pilot does not claim all-in cross-airline optimization yet.
+## Pricing and identity
 
-## Privacy, rate limits, and failure behavior
-- **Do not run private routes/dates as public GitHub Actions workflow inputs.** Workflow in this branch runs tests **only**, using fictional fixture fares, and performs no live searches.
-- Do not print personal flight routes, dates, tokens or stored search results into public CI logs.
-- Existing GoWild scanner caps at 12 route/date searches per invocation, defaults to 20 seconds between searches. Its documented discrepancy allowing `--delay 10` is a **separate outstanding fix**; this runner never passes the override.
-- On HTTP 403/406/429, missing FlightData, timeout, parsing errors: report **UNKNOWN**, never "NO_SEAT" or sold-out.
-- Searches are not retried automatically, and **no** overnight high-volume crawling is enabled.
-- `run.mjs` captures original script stdout rather than publishing it, writes its temporary JSON under an OS temporary folder, and deletes it on exit. The JSON emitted locally may contain sensitive travel details; store in a private channel if needed.
-- No credentials, no Frontier login, no reservations, no Supabase writes. Respect provider terms of service and use low-volume traffic.
-- Any production integration requires FLIGHT-1 owner approval, explicit Supabase control-plane wiring, evidence, and security review.
+- 1 adult; one **under-seat personal item only**, $0 for that item; zero overhead carry-ons and checked bags.
+- Elite Silver: included standard seat when eligible and available; premium seat charges are not assumed waived.
+- Frontier one-way fare types: GoWild, Discount Den, standard; compare all 3×3 = **9** eligible outbound/return combinations.
+- Source taxes and fees must be counted only once. Existing membership acquisition costs are excluded from marginal travel cost.
+- Frontier results are timestamped estimates subject to GoWild booking windows, blackout dates, seat supply, source changes and checkout verification.
+- Google fares may differ in inclusions and do **not** establish GoWild availability or a complete all-in itinerary price.
+- Underlying account eligibility / Silver benefit terms require final validation at booking. Do not expose account numbers or pass credentials in logs.
 
-## Validation gates
-- [x] Reviewed source and license of Eric Hansen `flights` (MIT).
-- [x] Baseline GoWild checker had an earlier independent live read from Frontier (2026-10-27).
-- [x] Deterministic unit tests defined for 9 combinations, sentinel `-1`, unknown/blocked, baggage profile, provider isolation.
-- [x] Offline core verification passed (9 tests, 0 failures): https://github.com/jshonuff/api-anything/actions/runs/41077394553
-- [x] Pinned FLI-JS source build and import verified on GitHub Actions: https://github.com/jshonuff/api-anything/actions/runs/41077995961
-- [ ] FLI-JS live adapter verified (one route only).
-- [ ] Eric Python adapter verified (one route only).
-- [ ] Combined one-route comparison reconciled independently with actual checkout.
-- [ ] Private execution and approved canonical persistence designed.
-- [ ] Explicit production promotion approval.
+## Alerts, failures and privacy
 
-## Authority
-- Owner: existing **FLIGHT-1**.
-- Canon: live **Supabase**. GitHub is source code and development evidence only.
-- Existing JC-SAVAGE production dispatch remains disabled; this pilot must not override it.
-- Fallback: retain the proven GoWild checker as a separate working path if FLI/Python integration becomes unreliable.
+`alerts.mjs` creates freshness-qualified **candidate** alerts locally; it does not send Telegram/WhatsApp notices, schedule checks, write Supabase, or guarantee bookings. Concepts were independently implemented from general GoWild Matcher patterns, not copied source.
 
-## First one-off live integration result — 2026-10-30
-- One generic demonstration route, no account login or booking.
-- Frontier booking-page adapter: **OBSERVED, 4 itineraries**.
-- FLI-JS adapter: **UNKNOWN, 0 itineraries**.
-- Eric Python adapter: **UNKNOWN, 0 itineraries**.
-- The failed optional adapters did **not** suppress valid Frontier results. The entire workflow completed successfully, but **this is not end-to-end live multi-provider success**.
-- Evidence: https://github.com/jshonuff/api-anything/actions/runs/41078251090
-- **Decision:** Keep adapters independent, retain proven GoWild standalone tool, diagnose optional providers separately. No production promotion, no scheduled monitoring or Supabase write.
+No personal dates, routes, fares, tokens or full responses should be logged to a public GitHub runner. One-off generic live probes in this branch print only status and result counts; detailed JSON is discarded from ephemeral runner temp. Do not use public Actions for private itinerary monitoring.
+
+The original GoWild script is unchanged; it caps searches at 12 route/date requests per run and defaults to 20 seconds between requests. Its standalone `--delay` override can still reduce pacing to 10 seconds; correcting that is an outstanding isolated maintenance item. The combined runner does not pass the override. HTTP 403/406/429, HTML where JSON was expected, parse errors, timeouts and missing data must remain UNKNOWN. Do not retry with bursts.
+
+## Evidence (October 30, 2026)
+
+- Baseline GoWild independently verified previously: https://github.com/jshonuff/api-anything/actions/runs/40478908146
+- Original three-provider attempt: Frontier 4 observations; FLI-JS 0, Eric 0: https://github.com/jshonuff/api-anything/actions/runs/41078251090
+- Isolated diagnostics: FLI-JS HTTP 200 with no readable Google WRB payload; Eric Frontier config HTTP 200 `text/html`, not JSON: https://github.com/jshonuff/api-anything/actions/runs/41084331331
+- Original FLI Python independently returned **23** results: https://github.com/jshonuff/api-anything/actions/runs/41084588061
+- **Combined one-route pilot: Frontier 5 observed flight records + Python FLI 23 Google results, zero provider errors**: https://github.com/jshonuff/api-anything/actions/runs/41085302160
+- Core normalization and fail-safe tests cover 9-way fare comparisons, no-seat sentinel, unknowns, fallback and personal-item-only profile. Offline CI must remain green before further changes.
+
+## Remaining promotion gates
+
+- Review and independently reconcile selected fares with actual checkout and fare inclusions.
+- Apply date-aware booking eligibility and ensure round-trip choices are genuinely bookable when recommended.
+- Confirm reliable Google Flights Python response across more than one route/date without excessive queries.
+- Build the combined dashboard (reuse original Frontier Finder's UI only; not its duplicate scraper).
+- Design private execution and the existing FLIGHT-1 authorized persistence/notification path.
+- Recheck live Supabase authority and obtain explicit promotion approval before any production activation.
+
+**Fallback contract:** If Python FLI, Eric or FLI-JS degrades, preserve the separately working GoWild checker and do not reclassify unknown prices as unavailable. Canonical owner: FLIGHT-1. Supabase remains canonical; GitHub is development source and evidence only.
