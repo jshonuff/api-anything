@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Development-only local orchestrator. Read-only, fail-open by provider, never writes to Supabase.
-// Usage: node tools/flight-unified/run.mjs DFW DEN 2026-11-05 [--return 2026-11-09] [--fli] [--fli-python] [--eric] [--nonstop]
+// Usage: node tools/flight-unified/run.mjs DFW DEN 2026-11-05 [--return 2026-11-09] [--fli] [--fli-js] [--eric] [--nonstop]
 // Requires Node >= 22 and optional fli-js / installed ericchansen/flights.
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
@@ -45,7 +45,7 @@ try {
   for(const r of routes)normalized.push({provider:'frontier_booking',origin:r.from,destination:r.to,date:r.date,status:'UNKNOWN',itineraries:[]});
  }
  // Optional Google Flights provider. A failure here cannot erase observed Frontier fares.
- if(args.includes('--fli')) for(const r of routes) try {
+ if(args.includes('--fli-js')) for(const r of routes) try {
   const {Airport,FlightSearchFilters,FlightSegment,MaxStops,SeatType,SortBy,SearchFlights}=await import('fli-js');
   const flt=new FlightSearchFilters({
    passenger_info:{adults:1,children:0,infants_in_seat:0,infants_on_lap:0},
@@ -59,14 +59,14 @@ try {
   });
   const flights=await new SearchFlights().search(flt,{currency:'USD'});
   if(!flights)throw new Error('No confirmed result');
-  normalized.push(normalizeFli(flights,{origin:r.from,destination:r.to,date:r.date,checkedAt:new Date().toISOString()}));
+  normalized.push(normalizeFli(flights,{origin:r.from,destination:r.to,date:r.date,checkedAt:new Date().toISOString(),provider:'google_flights_js'}));
  }catch(e) {
-  problems.push({provider:'google_flights',status:'UNKNOWN',reason:'PROVIDER_UNAVAILABLE_OR_NO_RESULTS'});
-  normalized.push({provider:'google_flights',origin:r.from,destination:r.to,date:r.date,status:'UNKNOWN',itineraries:[]});
+  problems.push({provider:'google_flights_js',status:'UNKNOWN',reason:'PROVIDER_UNAVAILABLE_OR_NO_RESULTS'});
+  normalized.push({provider:'google_flights_js',origin:r.from,destination:r.to,date:r.date,status:'UNKNOWN',itineraries:[]});
  }
  // Original Python FLI uses a separate TLS/response stack: optional Google cash-fare fallback.
  // It remains independent, and never confirms GoWild seats.
- if(args.includes('--fli-python')) for(const r of routes) try {
+ if(args.includes('--fli') || args.includes('--fli-python')) for(const r of routes) try {
   const {stdout}=await exec(process.env.FLI_PYTHON||'python3',
    [join(base,'fli_python_bridge.py'),r.from,r.to,r.date,...(args.includes('--nonstop')?['--nonstop']:[])],
    {cwd:temp,timeout,maxBuffer:2*1024*1024});
