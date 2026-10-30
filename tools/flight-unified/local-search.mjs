@@ -19,7 +19,8 @@ export function validateSearch(value,now=new Date()){
  if(typeof origin!=='string'||typeof destination!=='string'||!IATA.test(origin)||!IATA.test(destination)||origin===destination)throw Error('INVALID_AIRPORT');
  if(typeof date!=='string'||!validDate(date)||(returnDate&&(typeof returnDate!=='string'||!validDate(returnDate))))throw Error('INVALID_DATE');
  if(value.nonstop!==undefined&&typeof value.nonstop!=='boolean')throw Error('INVALID_NONSTOP');
- const today=now.toISOString().slice(0,10);
+ const today=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),
+  String(now.getDate()).padStart(2,'0')].join('-');
  const max=new Date(Date.parse(today+'T00:00:00Z')+366*86400000).toISOString().slice(0,10);
  if(date<today||date>max||(returnDate&&(returnDate<date||returnDate>max)))throw Error('DATE_OUT_OF_RANGE');
  return {origin,destination,date,returnDate,nonstop:value.nonstop===true};
