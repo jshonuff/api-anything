@@ -2,7 +2,7 @@ name: FLIGHT-1 local UI smoke
 on:
   push:
     branches: [jc-savage/flight-unified-pilot-20261030]
-    paths: [.github/workflows/flight-unified-ui-smoke.yml]
+    paths: [.github/workflows/flight-unified-ui-smoke.yml, tools/flight-unified/dashboard/**, tools/flight-unified/local-ui-smoke.mjs]
 permissions:
   contents: read
 jobs:
@@ -21,3 +21,4 @@ jobs:
           python3 -m http.server 8765 --bind 127.0.0.1 --directory tools/flight-unified > /dev/null 2>&1 &
           sleep 2
           node tools/flight-unified/dashboard/ui-smoke.mjs
+          node tools/flight-unified/local-ui-smoke.mjs
