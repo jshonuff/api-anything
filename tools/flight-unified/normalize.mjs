@@ -16,7 +16,7 @@ export function normalizeFrontier(report) {
     checkedAt, status: route.status === 'OK' ? 'OBSERVED' : 'UNKNOWN',
     reason: route.reason ?? null, blocked: Boolean(route.blocked),
     itineraries: route.status === 'OK' ? (route.flights ?? []).map(f => ({
-      provider: 'frontier_booking', flight: cleanText(f.flights),
+      provider: 'frontier_booking', checkedAt, flight: cleanText(f.flights),
       origin: route.from, destination: route.to, date: route.date,
       departure: cleanText(f.depart), arrival: cleanText(f.arrive),
       stops: Number.isInteger(f.stops) ? f.stops : null,
@@ -35,7 +35,7 @@ export function normalizeEric(rows, {origin, destination, date, checkedAt = null
   if (!Array.isArray(rows)) throw new Error('Eric results must be an array');
   return {provider:'eric_frontier', origin, destination, date, checkedAt,
     status:'CANDIDATE_ONLY', itineraries: rows.map(r => ({
-      provider:'eric_frontier', flight:cleanText(r.flight_number),
+      provider:'eric_frontier', checkedAt, flight:cleanText(r.flight_number),
       origin:r.origin ?? origin, destination:r.destination ?? destination,
       date:r.date ?? date, departure:r.depart_time ?? '',
       arrival:r.arrive_time ?? '', stops:Number.isInteger(r.stops) ? r.stops : null,
@@ -48,8 +48,13 @@ export function normalizeFli(results, {origin, destination, date, checkedAt = nu
   if (!Array.isArray(results)) throw new Error('FLI results must be an array');
   return {provider,origin,destination,date,checkedAt,
     status:'REFERENCE_ONLY',itineraries:results.filter(x => x && !Array.isArray(x)).map(r => ({
-      provider,
-      flight:(r.legs ?? []).map(l => String(l.flight_number ?? '')).join('+'),
+      provider, checkedAt,
+      flight:(r.legs ?? []).map(l => {
+        const number=String(l.flight_number ?? '').trim().toUpperCase();
+        const carrier=String(l.airline ?? '').trim().toUpperCase();
+        return /^\d{1,5}[A-Z]?$/.test(number) && /^[A-Z0-9]{2}$/.test(carrier)
+          ? carrier + number : number;
+      }).join('+'),
       origin,destination,date,
       departure:r.legs?.[0]?.departure_datetime ?? '',
       arrival:r.legs?.at(-1)?.arrival_datetime ?? '',
