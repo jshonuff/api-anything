@@ -3,25 +3,25 @@
 const FARE_LABELS = Object.freeze({
   gowild:'GoWild', discount_den:'Discount Den', standard:'Frontier standard', google_cash:'Google cash'
 });
-const MONEY = /^d+(?:.d{1,2})?$/;
+const MONEY = /^[0-9]+(?:[.][0-9]{1,2})?$/;
 function code(value) { return String(value??'').trim().toUpperCase(); }
 export function canonicalFlightNumber(input) {
- const raw=code(input).replace(/[s-]/g,'');
+ const raw=code(input).replace(/[ -]/g,'');
  if(!raw) return null;
  const parts=raw.split('+');
  const transformed=parts.map(part=>{
    // Frontier's website calls flight 2549 "FR2549", IATA carrier is "F9".
-   if(/^FRd{1,5}$/.test(part))return 'F9'+part.slice(2);
-   return /^[A-Z0-9]{2}d{1,5}[A-Z]?$/.test(part)?part:null;
+   if(/^FR[0-9]{1,5}$/.test(part))return 'F9'+part.slice(2);
+   return /^[A-Z0-9]{2}[0-9]{1,5}[A-Z]?$/.test(part)?part:null;
  });
  return transformed.every(Boolean)?transformed.join('+'):null;
 }
 function preciseDeparture(raw) {
  if(typeof raw!=='string')return null;
  const dt=raw.trim();
- if(!/^d{4}-dd-ddTdd:dd(?::dd(?:.d+)?)?(?:Z|[+-]dd:dd)?$/.test(dt))return null;
+ if(!/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(?::[0-9]{2}(?:[.][0-9]+)?)?(?:Z|[+-][0-9]{2}:[0-9]{2})?$/.test(dt))return null;
  const local=dt.slice(0,16);
- const tz=dt.match(/(Z|[+-]dd:dd)$/)?.[1]??'NAIVE';
+ const tz=dt.match(/(Z|[+-][0-9]{2}:[0-9]{2})$/)?.[1]??'NAIVE';
  return local+'@'+tz;
 }
 function itineraryKey(f) {
@@ -29,7 +29,7 @@ function itineraryKey(f) {
  const origin=code(f?.origin),dest=code(f?.destination);
  const day=String(f?.date??'');
  if(!flight||!departure||!(/^[A-Z]{3}$/.test(origin))||!(/^[A-Z]{3}$/.test(dest))||
-    !(/^d{4}-dd-dd$/.test(day)))return null;
+    !(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(day)))return null;
  return [origin,dest,day,flight,departure].join('|');
 }
 function isPrice(n) {return typeof n==='number'&&Number.isFinite(n)&&n>=0;}
