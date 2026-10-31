@@ -1,0 +1,44 @@
+name: FLIGHT-1 one generic live four-fare source inspection
+on:
+  push:
+    branches:
+      - jc-savage/flight-unified-pilot-20261030
+    paths:
+      - .github/workflows/flight-unified-four-source-probe.yml
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Google FLI Python
+        run: python -m pip install --quiet "git+https://github.com/jshonuff/fli.git@62eaaed9925c6ea63a606ccdbb74be3040e45d66"
+      - name: Check only one generic route, redact itinerary and prices
+        env:
+          FLI_PYTHON: python
+        run: |
+          node tools/flight-unified/run.mjs DEN LAS 2026-11-02 --fli > "$RUNNER_TEMP/four-sources.json"
+          python - <<'PY'
+          import json,os
+          path=os.path.join(os.environ["RUNNER_TEMP"],"four-sources.json")
+          data=json.load(open(path))
+          rows=data.get("candidates",[])
+          frontier=[r for r in rows if r.get("provider")=="frontier_booking"]
+          google=[r for r in rows if r.get("provider")=="google_flights_python"]
+          def count(name):return sum(isinstance(r.get("fares",{}).get(name),(int,float)) for r in frontier)
+          print(json.dumps({"provider":"frontier_booking",
+            "observedRows":len(frontier),"goWildPriced":count("gowild"),
+            "discountDenPriced":count("discount_den"),"standardPriced":count("standard"),
+            "googleCashRows":len(google),
+            "state":{x.get("provider"):x.get("status") for x in data.get("statusByProvider",[])},
+            "rule":"do not treat missing GoWild/Discount Den prices as sold-out or unavailable to members"}))
+          PY
+          rm -f "$RUNNER_TEMP/four-sources.json"
