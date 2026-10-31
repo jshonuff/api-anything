@@ -24,6 +24,9 @@ jobs:
       - name: Static JS syntax verification (NO LIVE QUERIES)
         run: |
           node --check tools/flight-unified/normalize.mjs
+          node --check tools/flight-unified/trip-core.mjs
+          node --check tools/flight-unified/trip.mjs
+          node --check tools/flight-unified/trip-core.test.mjs
           node --check tools/flight-unified/run.mjs
           node --check tools/flight-unified/alerts.mjs
           node --check tools/flight-unified/normalize.test.mjs
@@ -43,6 +46,6 @@ jobs:
       - name: Build pinned FLI-JS from source (NO LIVE QUERIES)
         run: bash tools/flight-unified/bootstrap-fli.sh
       - name: Verify isolated provider logic (NO LIVE QUERIES)
-        run: node --test tools/flight-unified/normalize.test.mjs tools/flight-unified/compare-ui.test.mjs tools/flight-unified/local-server.test.mjs tools/flight-unified/tailnet-gateway.test.mjs
+        run: node --test tools/flight-unified/normalize.test.mjs tools/flight-unified/compare-ui.test.mjs tools/flight-unified/local-server.test.mjs tools/flight-unified/tailnet-gateway.test.mjs tools/flight-unified/trip-core.test.mjs
       - name: Python syntax check (NO LIVE QUERIES)
-        run: python3 -m py_compile tools/flight-unified/eric_bridge.py tools/flight-unified/fli_python_bridge.py tools/flight-unified/eric_diagnostic.py
+        run: python3 -m py_compile tools/flight-unified/eric_bridge.py tools/flight-unified/fli_python_bridge.py tools/flight-unified/eric_diagnostic.py tools/flight-unified/fli_roundtrip_bridge.py
