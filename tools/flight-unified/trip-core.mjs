@@ -19,9 +19,12 @@ export function validateItinerary(spec){
  if(spec.nonstop!==undefined&&typeof spec.nonstop!=='boolean')throw Error('Invalid nonstop filter');
  const legs=spec.legs;
  const roundTrip=legs.length===2&&legs[0].from===legs[1].to&&legs[0].to===legs[1].from;
+ const returnsToOrigin=legs.at(-1).to===legs[0].from;
+ if(spec.mustReturnHome!==undefined&&typeof spec.mustReturnHome!=='boolean')throw Error('Invalid home-return rule');
+ if(spec.mustReturnHome&& !returnsToOrigin)throw Error('The final airport must match the departure airport.');
  return {legs:legs.map(l=>({from:l.from,to:l.to,date:l.date})),nonstop:spec.nonstop===true,
   kind:roundTrip?'ROUND_TRIP':legs.length===1?'ONE_WAY':'MULTI_CITY',
-  returnsToOrigin:legs.at(-1).to===legs[0].from};
+  returnsToOrigin};
 }
 function quotesForLeg(leg,result){
  if(!result||!Array.isArray(result.candidates))return [];
