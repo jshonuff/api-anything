@@ -69,6 +69,14 @@ Then parse the single JSON output `FLIGHT1_UNIFIED_TRIP_V1`; `comparison.bestInd
 5. Use the one combined report in ChatGPT/other AI conversations. The end user should only see the flight numbers and prices—not a request to install Tailscale/Node/Python.
 6. Keep experimental FLI-JS and Eric Hansen adapters optional/separate until proven live. **The known-good working system is GoWild checker + original Python FLI.**
 
+## Verified new source evidence — October 30/31, 2026
+
+- Live paired comparison, generic route: **25 Frontier itinerary observations**, including **19 GoWild-populated fares, 25 Discount Den fares, and 25 Standard fares**, plus **159 Google Flight search rows**. This confirms ALL FOUR source categories can be returned by the same combined runner. It does not confirm pass-member eligibility or checkout bookability: https://github.com/jshonuff/api-anything/actions/runs/41160766359
+- A true Google Flights two-segment search initially returned zero rows because `FlightSearchFilters.trip_type` defaulted to ONE_WAY. Correcting to `TripType.ROUND_TRIP` produced **15 live priced search-reference rows** on the generic test. Whether those amounts equal final checkout totals is still unverified: https://github.com/jshonuff/api-anything/actions/runs/41160715011
+- Latest strategy/offline regression suite passed: https://github.com/jshonuff/api-anything/actions/runs/41160731554
+- The existing `tools/gowild-check/gowild-check.js` was **not modified** on this development branch. No Supabase production controls were changed.
+- For explicit same-airport trips, supply `"mustReturnHome":true` in the itinerary JSON. `trip-core.mjs` rejects an itinerary that does not return to its original departure airport.
+
 ## Evidence and limitations
 
 - GitHub CI from prior baseline: https://github.com/jshonuff/api-anything/actions/runs/41123654961 (30 tests, prior to this new trip strategy).
