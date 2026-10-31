@@ -1,0 +1,32 @@
+name: FLIGHT-1 single roundtrip fare source check
+on:
+  push:
+    branches:
+      - jc-savage/flight-unified-pilot-20261030
+    paths:
+      - .github/workflows/flight-unified-roundtrip-probe.yml
+permissions:
+  contents: read
+jobs:
+  source-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install reviewed FLI Python source
+        run: python -m pip install --quiet "git+https://github.com/jshonuff/fli.git@62eaaed9925c6ea63a606ccdbb74be3040e45d66"
+      - name: One generic roundtrip; do not log prices or itineraries
+        run: |
+          python tools/flight-unified/fli_roundtrip_bridge.py DEN LAS 2026-11-04 2026-11-10 > "$RUNNER_TEMP/generic-rt.json"
+          python - <<'PY'
+          import os,json
+          file=os.path.join(os.environ["RUNNER_TEMP"],"generic-rt.json")
+          x=json.load(open(file))
+          print(json.dumps({"source":"google_flights_python","mode":"ROUND_TRIP",
+            "rows":len(x),"positivePriceRows":sum(1 for r in x if (r.get("total") or 0)>0),
+            "confidence":"SEARCH_REFERENCE_NOT_CHECKOUT_VERIFIED"}))
+          PY
+          rm -f "$RUNNER_TEMP/generic-rt.json"
