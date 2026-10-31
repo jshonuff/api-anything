@@ -33,7 +33,7 @@ const problems=[];
 const temp=await mkdtemp(join(tmpdir(),'flight-unified-'));
 try {
  // The known-good script executes untouched and is the sole source of observed GoWild fares.
- try {
+ if (!args.includes('--no-frontier')) try {
   const script=resolve(base,'../gowild-check/gowild-check.js');
   const cli=[script,origin,destination,date,...(returnDate?['--return',returnDate]:[]),...(args.includes('--nonstop')?['--nonstop']:[])];
   await exec(process.execPath,cli,{cwd:temp,timeout:timeout+ (returnDate?30000:0),maxBuffer:2*1024*1024});
@@ -44,6 +44,7 @@ try {
   problems.push({provider:'frontier_booking',status:'UNKNOWN',reason:e.killed?'TIMEOUT_OR_RATE_LIMIT':'REQUEST_OR_PARSE_FAILURE'});
   for(const r of routes)normalized.push({provider:'frontier_booking',origin:r.from,destination:r.to,date:r.date,status:'UNKNOWN',itineraries:[]});
  }
+ else for(const r of routes)normalized.push({provider:'frontier_booking',origin:r.from,destination:r.to,date:r.date,status:'UNKNOWN',reason:'SKIPPED_AFTER_UNREADABLE_FRONTIER',itineraries:[]});
  // Optional Google Flights provider. A failure here cannot erase observed Frontier fares.
  if(args.includes('--fli-js')) for(const r of routes) try {
   const {Airport,FlightSearchFilters,FlightSegment,MaxStops,SeatType,SortBy,SearchFlights}=await import('fli-js');
