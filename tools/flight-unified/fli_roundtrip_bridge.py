@@ -9,9 +9,10 @@ def main():
     if len(sys.argv)!=5:
         raise SystemExit("usage: fli_roundtrip_bridge.py ORIGIN DEST OUT_DATE RETURN_DATE")
     o,d,departure,return_date=sys.argv[1:5]
-    from fli.models import Airport,PassengerInfo,FlightSearchFilters,FlightSegment,SeatType,MaxStops,SortBy
+    from fli.models import Airport,PassengerInfo,FlightSearchFilters,FlightSegment,SeatType,MaxStops,SortBy,TripType
     from fli.search import SearchFlights
     filters=FlightSearchFilters(
+        trip_type=TripType.ROUND_TRIP,
         passenger_info=PassengerInfo(adults=1),
         flight_segments=[
           FlightSegment(departure_airport=[[Airport[o],0]],arrival_airport=[[Airport[d],0]],travel_date=departure),
