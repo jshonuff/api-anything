@@ -60,6 +60,7 @@ test('badly ordered itinerary or wrong return airport rejected',()=>{
  assert.throws(()=>validateItinerary({legs:[leg('MCI','ATL',c),leg('ATL','MCI',a)]}));
  assert.throws(()=>validateItinerary({legs:[leg('MCI','MCI',a)]}));
  assert.equal(validateItinerary({legs:[leg('MCI','ATL',a),leg('ATL','ICT',c)]}).returnsToOrigin,false);
+ assert.throws(()=>validateItinerary({mustReturnHome:true,legs:[leg('MCI','ATL',a),leg('ATL','ICT',c)]}));
 });
 test('unknown/blocked sources are not sold-out, and Eric candidates cannot establish GoWild',()=>{
  const spec={legs:[leg('MCI','ATL',a)]};
