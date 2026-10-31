@@ -32,7 +32,7 @@ test('city hopping is three separate one-way legs, can depart and return same ai
 });
 test('round trip: nine Frontier combinations and two one-ways compared with a distinct ticket quote',()=>{
  const spec={legs:[leg('MCI','ATL',a),leg('ATL','MCI',c)]};
- const d=[source('MCI','ATL',a,30,40,65,100),source('ATL','MCI',c,55,60,90,80)];
+ const d=[source('MCI','ATL',a,30,40,65,100),source('ATL','MCI',c,55,40,90,80)];
  const out=compareItinerary(spec,d,{roundTripCashQuotes:[
   {provider:'google_flights_python',currency:'USD',total:72,priceSource:'SECOND_LEG_SHOPPING_SEARCH'}]});
  assert.equal(out.mode,'ROUND_TRIP');
