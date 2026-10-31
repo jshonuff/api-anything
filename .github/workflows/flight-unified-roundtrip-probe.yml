@@ -1,4 +1,4 @@
-name: FLIGHT-1 single roundtrip fare source check
+name: FLIGHT-1 single roundtrip fare source check (correct trip type)
 on:
   push:
     branches:
