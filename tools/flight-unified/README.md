@@ -155,24 +155,24 @@ The backend binds to `127.0.0.1:8765`; the identity gateway binds to `127.0.0.1:
 
 **JC-approved policy, tested read-only logic; production monitoring still HOLD.**
 Use the EXISTING FLIGHT-1 controller, TX-CAP-004/005, current JC Flight Formula, the
-existing \`alerts.mjs\`, and canonical Supabase \`jc_savage.travel_deal_snapshots\`.
+existing `alerts.mjs`, and canonical Supabase `jc_savage.travel_deal_snapshots`.
 Do not create another fare tracker, external public endpoint, scheduler, or owner.
 
-\`analyzeFareHistory(snapshots, options)\` is a pure function returning stale/
+`analyzeFareHistory(snapshots, options)` is a pure function returning stale/
 insufficient/unchanged/drop/rise classifications and observed price low/high
 from eligible timestamped records. It never polls providers, guesses future fares,
 sends messages, edits the database, or books flights. The existing
-\`selectAlertCandidates\` remains unchanged and handles low-GoWild fare candidates.
+`selectAlertCandidates` remains unchanged and handles low-GoWild fare candidates.
 
-Only ingest as **comparable history** when each record has \`verification_state\`
-VERIFIED or OBSERVED, a valid current \`price_amount\`, USD currency, observation
+Only ingest as **comparable history** when each record has `verification_state`
+VERIFIED or OBSERVED, a valid current `price_amount`, USD currency, observation
 timestamp, and:
 
-- \`metadata.fare_comparable_total === true\`
-- \`metadata.fare_comparison_key\` = an upstream verified stable key encoding
+- `metadata.fare_comparable_total === true`
+- `metadata.fare_comparison_key` = an upstream verified stable key encoding
   exact route, travel dates, fare product/ticket topology, passenger count,
   cabin, luggage/seats, currency, and total fee/tax inclusion
-- optionally \`metadata.checkout_total_verified === true\` only when the exact
+- optionally `metadata.checkout_total_verified === true` only when the exact
   offer was independently reconciled at airline checkout.
 
 Never generate a key merely from route or marketing fare. Never treat an
@@ -185,7 +185,7 @@ observations once its canonical preflight conditions are satisfied. Without
 an authenticated execution path, qualified live provider feed, and checkout
 reconciliation, the operational state is **NOT LIVE**.
 
-Local regression: seven pure-function tests in \`alerts.test.mjs\`. The existing
-\`.github/workflows/flight-unified-ci.yml\` includes those tests. The latest
+Local regression: seven pure-function tests in `alerts.test.mjs`. The existing
+`.github/workflows/flight-unified-ci.yml` includes those tests. The latest
 Supabase owner record tracks source links, local tests, production HOLD, and
 the approved Daily Brief reference.
