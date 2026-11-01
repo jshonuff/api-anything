@@ -86,3 +86,14 @@ Then parse the single JSON output `FLIGHT1_UNIFIED_TRIP_V1`; `comparison.bestInd
 - **This repository stores working code. It does not, by itself, make ordinary ChatGPT able to run GitHub Actions or private scripts.** Never say a custom live GoWild check occurred when it was not actually executed.
 
 **Definition of done:** One user request → authorized executor calls Frontier/GoWild+Discount Den+Standard and Google Flights → compare complete multi-city or true round-trip strategy → one credible priced answer, without asking Human JC to operate software.
+
+
+## Verified repository identity reconciliation (2026-11-01)
+
+Two **distinct** GitHub development repositories are present; they must not be treated as copies of the same deployment.
+
+- **Provider-data execution pilot**: `jshonuff/api-anything`, branch `jc-savage/flight-unified-pilot-20261030`, folder `tools/flight-unified/`. Contains the working-in-pilot Frontier booking-page checker plus original Python FLI Google adapter, the multi-leg strategy and price-change candidate selector. This is the source of the earlier live test evidence; **not production and not directly callable by ordinary ChatGPT**.
+- **Workforce offline sandbox**: `jshonuff/jc-savage-ai-workforce`, GitHub [draft PR #5](https://github.com/jshonuff/jc-savage-ai-workforce/pull/5), **open and unmerged on 2026-11-01**. Operates on supplied snapshots; it is *not* a second working Frontier/Google authenticated/checkout provider, production deployment, or duplicate FLIGHT-1 owner.
+- **Canonical authority**: existing Supabase `jc_savage.travel_capabilities` entries `TX-CAP-004` and `TX-CAP-005` under FLIGHT-1. The canonical repo-role reconciliation is recorded at `metadata.flight_repository_reconciliation_20261101` on both capability rows. Do not overwrite that with any single repo name or silently promote PR #5.
+- **Canonical docs**: `jc_savage.documents` + current `jc_savage.document_versions`. The six current flight-doc bodies were backfilled into derived compatibility `core_document_versions` with matching hashes and version IDs as of 2026-11-01. Supabase remains authoritative; compatibility mirrors are not independent document truth. The v3.8 patch-log literal `\\n` formatting defect was fixed in a new content version while retaining the v3.8 semantic rules and prior history.
+- **Runtime**: integration remains on **HOLD**, pending approved executor, verified live provider feeds and checkout totals. No public flight endpoint, autonomous booking, or new scheduler is authorized here.
