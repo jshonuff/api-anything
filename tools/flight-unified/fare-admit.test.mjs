@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {stageComparableFareObservation} from './observation-admission.mjs';
+import {stageComparableFareObservation} from './fare-admit.mjs';
 const now='2026-11-02T18:00:00Z';
 const base=()=>({providerName:'Frontier',totalUsd:94.15,currency:'USD',
  evidence:{kind:'AIRLINE_DIRECT_QUOTE',sourceAuthenticated:true,sourceRef:'frontier-source-observation-A',
