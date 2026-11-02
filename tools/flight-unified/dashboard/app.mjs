@@ -1,4 +1,5 @@
 import {buildDashboardModel,reconcileCheckout} from '../compare-ui.mjs';
+import {buildFareWatchModel} from '../fare-watch.mjs';
 const $=id=>document.getElementById(id);
 const node=(tag,value,cls)=>{const x=document.createElement(tag);if(value!=null)x.textContent=String(value);if(cls)x.className=cls;return x;};
 const money=x=>Number.isFinite(x)?x.toLocaleString('en-US',{style:'currency',currency:'USD'}):'Unpriced';
@@ -105,4 +106,55 @@ $('searchForm').addEventListener('submit',async event=>{
  }catch(error){
   $('message').textContent=error.message||'No verified results. Try again later.';
  }finally{button.disabled=false;}
+});
+
+
+/* Source-only FLIGHT-1 Fare Watch. Imported JSON never leaves this browser tab. */
+let fareWatchModel=null;
+const watchDate=t=>new Date(t).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'});
+function renderFareWatch(){
+ const summary=$('watchSummary'),rows=$('watchRows');
+ summary.replaceChildren();rows.replaceChildren();
+ if(!fareWatchModel)return;
+ const filter=$('watchFilter').value.trim().toUpperCase();
+ const visible=fareWatchModel.destinations.filter(x=>!filter||x.destination.includes(filter));
+ summary.textContent=fareWatchModel.watchCount+' watched destination airports · '+
+  fareWatchModel.observationCount+' Going-email observations · '+
+  '0 live bookable prices verified · Export: '+watchDate(fareWatchModel.exportedAt)+
+  ' · '+fareWatchModel.canceledTrips.length+' inactive trip references';
+ for(const item of visible){
+  const tr=node('tr');tr.append(node('td',item.destination));
+  const latest=node('td');
+  if(item.latest){
+   latest.append(node('strong',money(item.latest.price)+' advertised from '+item.latest.origin));
+   latest.append(node('small','Email received '+watchDate(item.latest.observedAt)+
+     (item.latest.travelWindow?' · '+item.latest.travelWindow:'')));
+  }else latest.textContent='No Going-email evidence imported';
+  tr.append(latest);
+  const evidence=node('td');evidence.append(node('small',item.latest?
+    'EMAIL ONLY · NOT LIVE VERIFIED':'NO OBSERVATION'));
+  if(item.latest?.sourceUrl){
+   evidence.append(document.createTextNode(' · '));
+   const link=node('a','Open source email');link.href=item.latest.sourceUrl;
+   link.target='_blank';link.rel='noopener noreferrer';evidence.append(link);
+  }
+  tr.append(evidence);rows.append(tr);
+ }
+ $('watchMessage').textContent=visible.length?
+  'Showing '+visible.length+' airport(s). Imported prices are not comparable live quotes.':
+  'No matching watched airport. This does not mean flights are unavailable.';
+}
+$('watchFile').addEventListener('change',async event=>{
+ const file=event.target.files?.[0];if(!file)return;
+ try{
+  if(file.size>2_000_000)throw Error('Maximum private export size is 2 MB');
+  const candidate=buildFareWatchModel(JSON.parse(await file.text()));
+  fareWatchModel=candidate;renderFareWatch();
+ }catch(error){$('watchMessage').textContent='HOLD — cannot import Fare Watch: '+error.message;}
+ event.target.value='';
+});
+$('watchFilter').addEventListener('input',renderFareWatch);
+$('clearWatch').addEventListener('click',()=>{
+ fareWatchModel=null;$('watchRows').replaceChildren();$('watchSummary').replaceChildren();
+ $('watchFilter').value='';$('watchMessage').textContent='Private Fare Watch cleared from this tab.';
 });
