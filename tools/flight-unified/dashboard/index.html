@@ -30,6 +30,20 @@
 <button id="demo" type="button">Show synthetic demonstration</button>
 <p class="note">Optional: import a previous private JSON result. This app does not persist searches or transmit files to an external server.</p>
 </section>
+<section id="fareWatch" class="watch-panel" aria-labelledby="fareWatchTitle">
+<h2 id="fareWatchTitle">FLIGHT-1 Fare Watch</h2>
+<p class="note">Private watchlist view. Import a FLIGHT-1 owner-produced JSON snapshot from Supabase. This browser page does not contact Supabase, upload the file, or save it to the server.</p>
+<div class="watch-controls">
+<label for="watchFile">Import private Fare Watch export (JSON)</label>
+<input id="watchFile" type="file" accept=".json,application/json">
+<button id="clearWatch" type="button">Clear imported watchlist</button>
+<label for="watchFilter">Filter destination airport <input id="watchFilter" type="search" maxlength="3" placeholder="All airports"></label>
+</div>
+<p id="watchMessage" class="muted" role="status">No watchlist loaded. No live prices or alerts are available in this section.</p>
+<div id="watchSummary" aria-live="polite"></div>
+<div class="watch-scroll"><table><thead><tr><th>Destination</th><th>Latest email observation</th><th>Evidence</th></tr></thead><tbody id="watchRows"></tbody></table></div>
+<p class="note">Historical / email-advertised fares only. Route, dates, cabin and baggage may differ. No inferred price drops, automated monitoring or booking recommendations. Canceled trips remain inactive independently of airport watches.</p>
+</section>
 <section id="summary"></section>
 <section id="controls" hidden>
 <label>Source <select id="source"><option value="all">All</option><option value="frontier_booking">Frontier</option><option value="google_flights_python">Google Flights</option></select></label>
