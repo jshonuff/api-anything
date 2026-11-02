@@ -4,7 +4,7 @@ import http from 'node:http';
 
 const ASSETS = new Set([
  '/', '/dashboard/', '/dashboard/index.html', '/dashboard/style.css',
- '/dashboard/app.mjs', '/dashboard/demo.mjs', '/compare-ui.mjs', '/api/session'
+ '/dashboard/app.mjs', '/dashboard/demo.mjs', '/compare-ui.mjs', '/fare-watch.mjs', '/api/session'
 ]);
 const HOSTNAME = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:[.][a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*[.]ts[.]net$/;
 const EMAIL = /^[^\s@]+@[^\s@]+[.][^\s@]+$/;
