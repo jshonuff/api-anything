@@ -9,6 +9,7 @@ const assets=new Map([
  ['/dashboard/style.css',['dashboard/style.css','text/css; charset=utf-8']],
  ['/dashboard/app.mjs',['dashboard/app.mjs','text/javascript; charset=utf-8']],
  ['/dashboard/demo.mjs',['dashboard/demo.mjs','text/javascript; charset=utf-8']],
+ ['/fare-watch.mjs',['fare-watch.mjs','text/javascript; charset=utf-8']],
  ['/compare-ui.mjs',['compare-ui.mjs','text/javascript; charset=utf-8']]
 ]);
 const secureHeaders={
