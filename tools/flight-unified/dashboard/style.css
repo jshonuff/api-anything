@@ -40,3 +40,14 @@ footer{border-top:1px solid #23434e;padding:22px;color:#8ca7b7;text-align:center
 .search-form button{margin:15px 0 0}
 .search-form button:disabled{opacity:.45}
 .intro hr{border:0;border-top:1px solid #38525e;margin:15px 0}
+
+/* FLIGHT-1 private Fare Watch import; no server-side user data */
+.watch-panel{margin:28px 0;padding:24px;background:#102332;border:1px solid #315667;border-radius:18px}
+.watch-panel h2{margin:0 0 8px;color:#8df2df}.watch-controls{display:flex;gap:14px;flex-wrap:wrap;align-items:end;margin:17px 0}
+.watch-controls label{display:flex;flex-direction:column;gap:5px;font-size:.87rem;font-weight:650;color:#e0eff4}
+.watch-controls input[type=search]{padding:10px;border-radius:8px;border:1px solid #486674;background:#091a29;color:#fff;width:150px}
+#watchSummary{margin:14px 0;color:#e6f5ef;font-weight:700}#watchMessage{margin-bottom:10px}
+.watch-scroll{overflow-x:auto}.watch-panel table{width:100%;border-collapse:collapse}.watch-panel th,.watch-panel td{text-align:left;padding:11px;border-bottom:1px solid #2b4a5b;vertical-align:top}
+.watch-panel th{font-size:.8rem;color:#bad0dc}.watch-panel td{font-size:.9rem}.watch-panel td strong{display:block;font-size:1rem}
+.watch-panel small{color:#abc3ce}.watch-panel a{color:#8df2df}.watch-panel a:focus-visible{outline:2px solid #fff}
+@media(max-width:600px){.watch-panel{padding:14px}.watch-panel th,.watch-panel td{padding:8px}.watch-controls{align-items:stretch}}
