@@ -2,7 +2,14 @@ name: FLIGHT-1 local UI smoke
 on:
   push:
     branches: [jc-savage/flight-unified-pilot-20261030]
-    paths: [.github/workflows/flight-unified-ui-smoke.yml, tools/flight-unified/dashboard/**, tools/flight-unified/local-ui-smoke.mjs, tools/flight-unified/tailnet-mobile-smoke.mjs]
+    paths:
+      - .github/workflows/flight-unified-ui-smoke.yml
+      - tools/flight-unified/dashboard/**
+      - tools/flight-unified/local-ui-smoke.mjs
+      - tools/flight-unified/tailnet-mobile-smoke.mjs
+      - tools/flight-unified/local-server.mjs
+      - tools/flight-unified/tailnet-gateway.mjs
+      - tools/flight-unified/fare-watch.mjs
 permissions:
   contents: read
 jobs:
