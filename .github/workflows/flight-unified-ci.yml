@@ -31,7 +31,9 @@ jobs:
           node --check tools/flight-unified/alerts.mjs
           node --check tools/flight-unified/alerts.test.mjs
           node --check tools/flight-unified/fare-admit.mjs
-          node --check tools/flight-unified/fare-admit.test.mjs
+          node --check tools/flight-unified/fare-admit.test.mjs tools/flight-unified/fare-watch.test.mjs
+          node --check tools/flight-unified/fare-watch.mjs
+          node --check tools/flight-unified/fare-watch.test.mjs
           node --check tools/flight-unified/normalize.test.mjs
           node --check tools/flight-unified/diagnose.mjs
           node --check tools/flight-unified/compare-ui.mjs
