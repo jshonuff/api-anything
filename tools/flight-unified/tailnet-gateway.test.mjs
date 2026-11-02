@@ -71,6 +71,7 @@ test('identity-checked mobile requests proxy only whitelisted assets and authent
   assert.equal(JSON.parse(session.body).token,'X'.repeat(64));
   assert.equal((await request({port,path:'/dashboard/'})).status,200);
   assert.equal((await request({port,path:'/compare-ui.mjs'})).status,200);
+  assert.equal((await request({port,path:'/fare-watch.mjs'})).status,200);
   assert.equal((await request({port,path:'/hidden.txt'})).status,404);
   assert.equal((await request({port,method:'DELETE',path:'/api/search'})).status,404);
   assert.equal((await request({port,method:'POST',path:'/api/search',
