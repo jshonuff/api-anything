@@ -54,6 +54,33 @@ The original GoWild script is unchanged; it caps searches at 12 route/date reque
 - **Combined one-route pilot: Frontier 5 observed flight records + Python FLI 23 Google results, zero provider errors**: https://github.com/jshonuff/api-anything/actions/runs/41085302160
 - Core normalization and fail-safe tests cover 9-way fare comparisons, no-seat sentinel, unknowns, fallback and personal-item-only profile. Offline CI must remain green before further changes.
 
+## FLIGHT-1 Fare Watch (private local display)
+
+The existing local dashboard now has a **FLIGHT-1 Fare Watch** section. It reads an optional owner-produced JSON export **inside the browser tab only**. No public portal or external endpoint is allowed to query JC's private Supabase records; no upload, persistence, schedule, notifications, or live fare claims are made.
+
+Import format (private; never commit real travel records to GitHub):
+
+```json
+{
+  "format": "FLIGHT1_WATCH_EXPORT_V1",
+  "exported_at": "2026-11-02T20:00:00Z",
+  "watch_destinations": ["AUS", "STT"],
+  "trips": [{"trip_id": "TRP-016", "status": "CANCELED"}],
+  "observations": [{
+    "source_provider": "GOING_GMAIL",
+    "currency": "USD",
+    "price_amount": 484,
+    "observed_at": "2026-10-29T22:01:52Z",
+    "verification_state": "SOURCE_VERIFIED",
+    "deal_status": "HISTORICAL",
+    "source_url": "https://mail.google.com/mail/u/0/#all/example",
+    "metadata": {"gmail_message_id": "synthetic-id", "origin": "MCI", "destination": "STT", "travel_window": "Nov-Feb 2027"}
+  }]
+}
+```
+
+**Explicit limitations:** all displayed Going prices are email-advertised and NOT live verified. A watched airport is not a trip, canceled trips are not reinstated, and different email prices do NOT establish genuine price rises/falls. Original Gmail links are constrained to HTTPS mail.google.com. An owner-approved private export or authenticated read gateway is still required to populate the dashboard from live canon; public hosted FLIGHT-1 portal is unchanged. The private import is deliberately cleared on page reload or clicking Clear. No user travel data belongs in the repository or public CI fixtures.
+
 ## Local comparison dashboard (development)
 
 The standalone `dashboard/` interface reads the unified runner's JSON **inside the current browser tab**; it does not upload, publish, transmit or automatically persist it. It shows provider-specific quotes, precise matched-itinerary deduplication, fare filters and **manual** checkout reconciliation. In the menu, choose **Show synthetic demonstration** to explore without real travel data.
