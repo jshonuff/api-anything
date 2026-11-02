@@ -46,6 +46,7 @@ test('localhost session, static asset allowlist, CSP and refusal of invalid toke
   assert.equal((await session.json()).token.length,64);
   assert.equal((await fetch(addr+'/dashboard/')).status,200);
   assert.equal((await fetch(addr+'/compare-ui.mjs')).status,200);
+  assert.equal((await fetch(addr+'/fare-watch.mjs')).status,200);
   assert.equal((await fetch(addr+'/private.txt')).status,404);
   assert.equal((await post(addr,valid(),'bad')).status,403);
   assert.equal((await post(addr,valid(),'x'.repeat(64),'https://unrelated.example')).status,403);
