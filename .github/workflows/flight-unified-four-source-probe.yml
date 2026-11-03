@@ -25,7 +25,7 @@ jobs:
         env:
           FLI_PYTHON: python
         run: |
-          node tools/flight-unified/run.mjs DEN LAS 2026-11-02 --fli > "$RUNNER_TEMP/four-sources.json"
+          node tools/flight-unified/run.mjs DEN LAS 2026-11-03 --fli > "$RUNNER_TEMP/four-sources.json"
           python - <<'PY'
           import json,os
           path=os.path.join(os.environ["RUNNER_TEMP"],"four-sources.json")
