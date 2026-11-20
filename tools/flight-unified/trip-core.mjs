@@ -41,7 +41,7 @@ function quotesForLeg(leg,result){
    if(!num(price))continue;
    if(type==='gowild'&&row.goWildStatus!=='FARE_OBSERVED')continue;
    quotes.push({fare:type,amount:price,flight:row.flight||'UNSPECIFIED',
-    departure:row.departure||null,provider:row.provider,origin:leg.from,destination:leg.to,
+    departure:row.departure||null,arrival:row.arrival||null,provider:row.provider,origin:leg.from,destination:leg.to,
     date:leg.date,confidence:type==='gowild'?'GOWILD_FARE_OBSERVED':
       type==='google_cash'?'GOOGLE_REFERENCE_QUOTE':'FRONTIER_FARE_OBSERVED',
     checkoutStatus:'NOT_VERIFIED'});
