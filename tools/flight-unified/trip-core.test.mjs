@@ -9,11 +9,11 @@ const source=(from,to,date,gowild,den,standard,google)=>({
   {provider:'google_flights_python',status:'REFERENCE_ONLY',count:1}],
  candidates:[
  {provider:'frontier_booking',origin:from,destination:to,date,
-  flight:'FR123',departure:date+'T08:00:00',currency:'USD',
+  flight:'FR123',departure:date+'T08:00:00',arrival:date+'T11:15:00',currency:'USD',
   goWildStatus:gowild===null?'UNKNOWN':'FARE_OBSERVED',
   fares:{gowild,discount_den:den,standard}},
  {provider:'google_flights_python',origin:from,destination:to,date,
-  flight:'DL456',departure:date+'T10:00:00',currency:'USD',fares:{google_cash:google}}
+  flight:'DL456',departure:date+'T10:00:00',arrival:date+'T13:50:00',currency:'USD',fares:{google_cash:google}}
  ]});
 test('city hopping is three separate one-way legs, can depart and return same airport',()=>{
  const spec={legs:[leg('MCI','ATL',a),leg('ATL','DFW',b),leg('DFW','MCI',c)]};
@@ -27,6 +27,9 @@ test('city hopping is three separate one-way legs, can depart and return same ai
  assert.equal(out.mode,'MULTI_CITY');
  assert.equal(out.bestIndependentMix.total,110);
  assert.deepEqual(out.bestIndependentMix.legs.map(x=>x.fare),['gowild','google_cash','gowild']);
+ assert.equal(out.bestIndependentMix.legs[0].arrival,a+'T11:15:00');
+ assert.equal(out.bestIndependentMix.legs[1].arrival,b+'T13:50:00');
+ assert.equal(out.legs[0].quotes.find(x=>x.fare==='standard').arrival,a+'T11:15:00');
  assert.equal(out.strategies.singleTicketCash,null);
  assert.equal(out.legs[1].quotes.some(q=>q.fare==='gowild'),false);
 });
@@ -69,6 +72,7 @@ test('unknown/blocked sources are not sold-out, and Eric candidates cannot estab
    fares:{gowild:2}},{provider:'google_flights_python',origin:'MCI',destination:'ATL',date:a,
    currency:'USD',fares:{google_cash:117}}]}]);
  assert.equal(out.bestIndependentMix.total,117);
+ assert.equal(out.bestIndependentMix.legs[0].arrival,null);
  assert.equal(out.legs[0].sourceStatus.frontier,'PARTIAL_OR_UNKNOWN');
  assert.equal(out.legs[0].missingMeansSoldOut,false);
  assert.equal(out.noGoWildMeansUnverified,true);
